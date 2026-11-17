@@ -1,0 +1,12 @@
+# Auto-detect text files and normalize line endings
+* text=auto
+
+# Binary files
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.sqlite3 binary
+*.sqlite binary

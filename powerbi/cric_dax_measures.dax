@@ -1,0 +1,94 @@
+// ============================================================================
+// CRIC ANALYTICS: Power BI DAX Measures Library
+// ============================================================================
+
+// 1. Bowling Volume
+Legal Balls =
+CALCULATE(
+    COUNTROWS(fact_delivery),
+    fact_delivery[is_legal_delivery] = TRUE()
+)
+
+Overs Bowled =
+DIVIDE([Legal Balls], 6, 0)
+
+// 2. Runs and Conceded Metrics
+Runs Conceded =
+SUMX(
+    fact_delivery,
+    fact_delivery[runs_batter] + fact_delivery[extra_wides] + fact_delivery[extra_noballs]
+)
+
+Dot Balls =
+CALCULATE(
+    COUNTROWS(fact_delivery),
+    fact_delivery[is_legal_delivery] = TRUE(),
+    (fact_delivery[runs_batter] + fact_delivery[extra_wides] + fact_delivery[extra_noballs]) = 0
+)
+
+Fours Conceded =
+CALCULATE(
+    COUNTROWS(fact_delivery),
+    fact_delivery[runs_batter] = 4
+)
+
+Sixes Conceded =
+CALCULATE(
+    COUNTROWS(fact_delivery),
+    fact_delivery[runs_batter] = 6
+)
+
+Boundaries Conceded = [Fours Conceded] + [Sixes Conceded]
+
+// 3. Wickets
+Credited Wickets =
+CALCULATE(
+    COUNTROWS(fact_wicket),
+    fact_wicket[is_bowler_credited] = TRUE()
+)
+
+Total Wickets Involving Bowler =
+COUNTROWS(fact_wicket)
+
+// 4. Rate Metrics (with NULL/BLANK division safeguards)
+Economy Rate =
+DIVIDE(
+    [Runs Conceded],
+    [Overs Bowled],
+    BLANK()
+)
+
+Bowling Average =
+DIVIDE(
+    [Runs Conceded],
+    [Credited Wickets],
+    BLANK()
+)
+
+Bowling Strike Rate =
+DIVIDE(
+    [Legal Balls],
+    [Credited Wickets],
+    BLANK()
+)
+
+Dot Ball Percentage =
+DIVIDE(
+    [Dot Balls],
+    [Legal Balls],
+    BLANK()
+) * 100
+
+Boundary Percentage =
+DIVIDE(
+    [Boundaries Conceded],
+    [Legal Balls],
+    BLANK()
+) * 100
+
+// 5. Matchup Weight
+Matchup Weight =
+MIN(
+    1.0,
+    DIVIDE([Legal Balls], 30.0, 0)
+)

@@ -1,0 +1,8 @@
+[postgresql]
+host = localhost
+port = 5432
+dbname = cric_analytics
+user = postgres
+password = your_password_here
+schema = cricket_fact
+sslmode = prefer

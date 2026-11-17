@@ -1,0 +1,53 @@
+CRIC PHASE 10 - HISTORICAL DECISION EVALUATION AUDIT
+Run ID: 20261012T115559Z
+Project: C:\CRIC
+
+PRIMARY STATUS
+B - LIMITED DESCRIPTIVE EVALUATION ONLY.
+
+Historical ranking and counterfactual evaluation are blocked. The data can support descriptive summaries of observed deliveries and outcomes for the bowler actually used. It does not establish an eligible alternative-candidate set, availability at decision time, bowling quota state, or labels for unused bowlers. No predictive metrics, confidence intervals, or causal claims were calculated.
+
+PHASE 9 BASELINE
+Phase 9 outputs were inspected and independently loaded. Tests recorded: 32 Phase 9 tests passed; 68 existing regression tests passed. Six of six formula checks passed. Date-grouped splits were 2,117 development, 1,001 validation, and 1,105 final-holdout matches: 4,223 unique matches. Seven T20/50-over metadata anomalies were excluded. The Phase 9 report contains no predictive metrics.
+
+PHASE 10 COUNTS
+{
+  "matches": 4230,
+  "deliveries": 966985,
+  "legal_deliveries": 925882,
+  "wicket_events": 53294,
+  "bowler_credited_wickets": 48983,
+  "roster_rows": 93630,
+  "roster_matches": 4230
+}
+Roster match row-count distribution: {"21": 5, "22": 3922, "23": 37, "24": 260, "25": 6}
+Per-team roster row-count distribution: {"10": 5, "11": 7886, "12": 563, "13": 6}
+Roster rows with no same-match batter/bowler delivery participation: 5189.
+Unique roster IDs absent from all delivery records: 96.
+Duplicate match/player extra rows: 1; cross-team assignments: [{"match_id": "1229824", "player_id": "efcb778e", "row_count": 2, "teams": ["Guernsey", "Isle of Man"]}]; same-team duplicates: [].
+Rows with missing bowls_flag: 3903; unique roster IDs with missing role flag: 663.
+Unknown match/player IDs and roster team mismatches: 0/0/0. Delivery participants without a same-match roster row: 0; with no same-team roster key: 0.
+
+PROVENANCE
+Local ingestion metadata provides local paths, file sizes, SHA-256 checksums, modified timestamps, and validation status. External origin, source URL, license, official status, and extraction lineage for match_playing_xi.csv are unknown/not established. The table only has match_id, team, player_id, player_name. Its clean joins do not establish announced-XI semantics.
+
+ELIGIBILITY AND OUTCOMES
+Team membership is supported by local rows but roster semantics remain uncertain. Decision-time availability and permission to bowl are unknown. Bowling-role flags are undated and missing for some rows. Historical actual bowling is an observed outcome, not evidence of prior eligibility. Descriptive over outcome semantics are documented in CSV; incomplete horizons are unavailable, never zero. Only actual bowler outcomes are observed.
+
+EVALUATION FEASIBILITY
+Historical descriptive analysis: feasible with selection limits.
+Retrospective ranking: blocked.
+Counterfactual evaluation: blocked.
+Prospective shadow: feasible after decision-snapshot and recommendation logging.
+Prospective intervention: not ready; requires a preregistered governed design.
+
+TESTS
+12 passed in 0.21s
+68 passed in 58.21s
+No predictive ranking metrics were calculated.
+
+NEXT REQUIRED DATA
+Obtain official roster semantics/provenance and license; timestamped XI, availability, substitution/replacement events; format rules and decision-time quota state; immutable candidate/decision/recommendation/actual-selection logs; and a frozen, reviewed outcome protocol. Do not infer missing evidence from later bowling participation.
+
+PRESERVATION
+Source hashes under data/ were compared before and after this run. Source data, HDFS, infrastructure settings, production scoring/API/frontend, and Phase 2-9 code were not modified by Phase 10.

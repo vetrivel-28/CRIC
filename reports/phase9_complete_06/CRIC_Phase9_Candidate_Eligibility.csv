@@ -1,0 +1,10 @@
+﻿measure,value,status,notes
+total_matches,4230,observed,All match records with date metadata.
+eligible_matches_admitted,0,blocked,"Roster inclusion/availability, decision-time quota state, and counterfactual alternative outcomes are not established by local source fields."
+decision_scenarios_admitted,0,blocked,No scenarios scored because the candidate set and counterfactual target cannot be validated.
+raw_matches_by_roster_row_count,"{""21"": 5, ""22"": 3922, ""23"": 37, ""24"": 260, ""25"": 6}",observed_not_eligibility,Roster row counts are not evidence of decision-time availability.
+raw_roster_rows_by_bowls_flag,"{""false"": 21258, ""missing"": 3903, ""true"": 68469}",observed_not_eligibility,Role flags lack historical validity/source provenance.
+duplicate_match_player_rows,1,quality_issue,One duplicate key; the record assigns one player to both teams in the same match.
+unique_roster_ids_absent_from_all_deliveries,96,unresolved,May be unused roster/substitute records; source does not distinguish.
+unique_roster_ids_with_missing_bowls_flag,663,unresolved,Cannot establish bowling eligibility from the catalog.
+format_anomaly_matches,7,excluded,All metadata T20 but overs=50; actual max over is 19. Excluded from future evaluation splits and history.

@@ -1,0 +1,18 @@
+# ==============================================================================
+# CRIC: Cricket Analytics & Intelligent Match Strategy
+# Active Python Dependencies for PostgreSQL + Data Analytics Architecture (Python 3.13)
+# ==============================================================================
+
+# PostgreSQL 16+ Database Driver & Connection Pool
+psycopg[binary,pool]>=3.1.18
+
+# Data Processing & Numerical Computation
+pandas>=2.2.0
+numpy>=1.26.0
+
+# Testing & Quality Assurance
+pytest>=8.0.0
+pytest-cov>=4.1.0
+
+# Evaluation & Report Generation
+reportlab>=4.0.0

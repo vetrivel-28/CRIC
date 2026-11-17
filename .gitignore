@@ -1,0 +1,109 @@
+# ==============================================================================
+# CRIC Project: Professional .gitignore
+# Cricket Analytics & Intelligent Match Strategy
+# ==============================================================================
+
+# --- Python & Bytecode ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# --- Virtual Environments ---
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# --- Testing & Code Quality ---
+.pytest_cache/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+htmlcov/
+
+# --- Environment & Credentials ---
+.env
+.env.*
+!.env.example
+config/database.ini
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+
+# --- Runtime Logs ---
+logs/
+*.log
+*.log.*
+
+# --- Local Quarantine, Temporary & Backup Files ---
+_cleanup_quarantine/
+audit_20261117/
+phase2_outputs/
+CRIC_Complete_Project_Audit_Report.pdf
+backups/
+*.tmp
+*.temp
+*.swp
+*~
+
+# --- Legacy Big Data / Hadoop Archives ---
+archive/
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.rar
+
+# --- Database Dumps & Exports ---
+*.dump
+*.sql.bak
+*.psql.bak
+*.bak
+*.bak_*
+*.backup
+*.backup_*
+*.sqlite3
+*.sqlite
+evaluation/phase11/store/*.sqlite3
+
+# --- Large Local Datasets (> 100MB Hard GitHub Limit) ---
+# deliveries.csv is 135.13 MB, exceeding GitHub's maximum limit of 100.00 MB.
+# It is preserved permanently on local disk and documented in data/README.md.
+data/raw/deliveries.csv
+
+# --- IDE & OS Metadata ---
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#005746">
+    <title>CRIC | Cricket Performance Analytics</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+    <script src="/app.js" defer></script>
+    <script src="/dashboard.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#overview" aria-label="CRIC overview">
+        <span class="brand-mark" aria-hidden="true">C</span>
+        <span><strong>CRIC</strong><small>Cricket performance analytics</small></span>
+      </a>
+      <nav class="primary-nav" aria-label="Main navigation">
+        <a href="#overview" data-page-link="overview">Overview</a>
+        <a href="#analytics" data-page-link="analytics">Analytics</a>
+        <a href="#decision-support" data-page-link="decision-support">Decision Support</a>
+      </nav>
+      <div class="topbar-actions">
+        <span id="service-status" class="connection-status" role="status"><i aria-hidden="true"></i><span>Checking data connection…</span></span>
+        <button id="refresh-dashboard" class="button button-small button-secondary refresh-button" type="button">Refresh data</button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <div id="page-error" class="page-error" role="alert" hidden>
+        <span id="page-error-message">Dashboard data could not be loaded.</span>
+        <button id="retry-load" class="button button-small button-secondary" type="button">Retry</button>
+      </div>
+      <div id="dashboard-notice" class="dashboard-notice" role="status" hidden></div>
+
+      <section id="overview" class="page-panel" aria-labelledby="page-title">
+        <div class="page-heading">
+          <div><p class="eyebrow">HISTORICAL ANALYTICS</p><h1 id="page-title">Cricket performance overview</h1><p id="page-subtitle">Verified aggregates from the available cricket datasets.</p></div>
+          <span class="historical-pill">HISTORICAL DATA</span>
+        </div>
+        <div id="kpi-error" class="inline-state" role="status" hidden></div>
+        <section class="kpi-grid" aria-label="Dataset summary">
+          <article class="kpi-card"><span>Matches</span><strong id="kpi-matches">—</strong><small>Identifiable match records</small></article>
+          <article class="kpi-card"><span>Unique bowlers</span><strong id="kpi-bowlers">—</strong><small>Historical bowler keys</small></article>
+          <article class="kpi-card"><span>Unique batters</span><strong id="kpi-batters">—</strong><small>Historical batter keys</small></article>
+          <article class="kpi-card"><span>Credited wickets</span><strong id="kpi-wickets">—</strong><small>Bowler-credited dismissals</small></article>
+          <article class="kpi-card"><span>Matchup records</span><strong id="kpi-matchups">—</strong><small>Bowler–batter aggregates</small></article>
+          <article class="kpi-card"><span>Available datasets</span><strong id="kpi-datasets">—</strong><small>Read-only analytical tables</small></article>
+        </section>
+
+        <section class="content-section" aria-labelledby="overview-charts-title">
+          <div class="section-heading-row"><div><p class="eyebrow">AT A GLANCE</p><h2 id="overview-charts-title">Bowling outcomes</h2></div><p class="section-note">Only records present in the loaded historical aggregates are shown.</p></div>
+          <div class="chart-grid overview-chart-grid">
+            <article class="dashboard-card chart-card"><div class="card-heading"><div><h3>Credited wickets by phase</h3><p>Bowler-credited wickets recorded in each dataset phase.</p></div></div><div class="chart-wrap"><canvas id="overview-phase-wickets-chart" aria-label="Credited wickets by phase chart"></canvas></div><p id="overview-chart-state" class="component-state" role="status" hidden></p></article>
+            <article class="dashboard-card chart-card"><div class="card-heading"><div><h3>Leading bowlers</h3><p>Highest credited-wicket totals; legal-ball sample shown on hover.</p></div></div><div class="chart-wrap"><canvas id="top-bowlers-chart" aria-label="Leading bowlers by credited wickets chart"></canvas></div></article>
+          </div>
+        </section>
+
+        <details id="data-explorer" class="data-explorer dashboard-card">
+          <summary><span><strong>Dataset catalog</strong><small>Inspect available source tables and paginated records.</small></span><span class="summary-action">Open catalog</span></summary>
+          <div class="explorer-content">
+            <div class="explorer-controls">
+              <label class="filter-control explorer-select"><span>Dataset</span><select id="dataset-select"><option value="">Open catalog to load datasets</option></select></label>
+              <label class="filter-control filter-search"><span>Search current dataset</span><input id="dataset-search" type="search" placeholder="Search values in every column" disabled></label>
+              <label class="filter-control"><span>Rows per page</span><select id="dataset-page-size"><option value="10">10</option><option value="25" selected>25</option><option value="50">50</option><option value="100">100</option></select></label>
+            </div>
+            <div id="dataset-metadata" class="dataset-metadata"><p class="empty-state">Choose a dataset to inspect its schema and quality profile.</p></div>
+            <div class="table-card">
+              <div class="card-heading table-heading"><div><h3 id="dataset-table-title">Dataset records</h3><p id="dataset-table-count">Select a dataset to load paginated rows.</p></div><span id="dataset-integrity" class="chart-tag">READ ONLY</span></div>
+              <div class="table-scroll"><table id="dataset-table"><thead><tr><th class="table-state">Select a dataset</th></tr></thead><tbody><tr><td class="table-state">No dataset selected.</td></tr></tbody></table></div>
+              <div class="table-footer"><span id="dataset-page-label">Page 1</span><div><button id="dataset-prev" class="button button-small button-secondary" type="button">Previous</button><button id="dataset-next" class="button button-small button-secondary" type="button">Next</button></div></div>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section id="analytics" class="page-panel" aria-labelledby="analytics-title" hidden>
+        <div class="page-heading"><div><p class="eyebrow">EXPLORE THE AGGREGATES</p><h1 id="analytics-title">Performance analytics</h1><p>Compare historical bowling, matchup, phase and dismissal records.</p></div><button class="button button-small button-secondary clear-filters" type="button">Clear all filters</button></div>
+        <div class="analytics-tabs" role="tablist" aria-label="Analytics views">
+          <button id="tab-bowler" class="analytics-tab" type="button" role="tab" aria-controls="bowler-analytics" aria-selected="true" data-analytics-tab="bowler-analytics">Bowler Performance</button>
+          <button id="tab-matchups" class="analytics-tab" type="button" role="tab" aria-controls="matchup-analytics" aria-selected="false" data-analytics-tab="matchup-analytics">Bowler-Batter Matchups</button>
+          <button id="tab-phases" class="analytics-tab" type="button" role="tab" aria-controls="phase-analysis" aria-selected="false" data-analytics-tab="phase-analysis">Bowling Phases</button>
+          <button id="tab-wickets" class="analytics-tab" type="button" role="tab" aria-controls="wicket-analysis" aria-selected="false" data-analytics-tab="wicket-analysis">Wicket Analysis</button>
+        </div>
+
+        <section id="bowler-analytics" class="analytics-panel" role="tabpanel" aria-labelledby="tab-bowler">
+          <div class="filter-bar">
+            <label class="filter-control"><span>Bowler</span><select id="bowler-select"><option value="">Select a bowler</option></select></label>
+          </div>
+          <div id="bowler-error" class="component-state" role="status" hidden></div>
+          <section class="kpi-grid bowler-kpi-grid" aria-label="Selected bowler performance">
+            <article class="kpi-card"><span>Credited wickets</span><strong id="bowler-wickets">—</strong><small>Bowler-credited</small></article>
+            <article class="kpi-card"><span>Economy</span><strong id="bowler-economy">—</strong><small>Runs conceded / legal balls × 6</small></article>
+            <article class="kpi-card"><span>Bowling average</span><strong id="bowler-average">—</strong><small>Runs conceded / credited wickets</small></article>
+            <article class="kpi-card"><span>Bowling strike rate</span><strong id="bowler-strike-rate">—</strong><small>Legal balls / credited wickets</small></article>
+            <article class="kpi-card"><span>Legal balls</span><strong id="bowler-balls">—</strong><small>Sample size</small></article>
+          </section>
+          <div class="chart-grid">
+            <article class="dashboard-card chart-card"><div class="card-heading"><div><h2>Performance by phase</h2><p>Economy and credited wickets for the selected bowler.</p></div></div><div class="chart-wrap"><canvas id="bowler-phase-chart" aria-label="Bowler performance by phase"></canvas></div><p id="bowler-chart-state" class="component-state" role="status" hidden></p></article>
+            <article class="dashboard-card chart-card"><div class="card-heading"><div><h2>Season trend</h2><p>Credited wickets by season where a chronological season is available.</p></div></div><div class="chart-wrap"><canvas id="bowler-season-chart" aria-label="Bowler credited wickets by season"></canvas></div><p id="season-chart-state" class="component-state" role="status" hidden></p></article>
+          </div>
+        </section>
+
+        <section id="matchup-analytics" class="analytics-panel" role="tabpanel" aria-labelledby="tab-matchups" hidden>
+          <div class="filter-bar matchup-filters">
+            <label class="filter-control"><span>Bowler</span><select id="matchup-bowler"><option value="">Select a bowler</option></select></label>
+            <label class="filter-control"><span>Batter</span><select id="matchup-batter"><option value="">All batters</option></select></label>
+            <label class="filter-control"><span>Minimum legal balls</span><select id="matchup-min-balls"><option value="0">No minimum</option><option value="12">12</option><option value="30" selected>30</option><option value="60">60</option><option value="120">120</option></select></label>
+          </div>
+          <div id="matchup-error" class="component-state" role="status" hidden></div>
+          <div class="chart-grid">
+            <article class="dashboard-card chart-card"><div class="card-heading"><div><h2>Runs and wickets</h2><p>Top qualifying batter matchups for the selected bowler.</p></div></div><div class="chart-wrap"><canvas id="matchup-chart" aria-label="Matchup runs and wickets chart"></canvas></div></article>
+            <article class="dashboard-card chart-card"><div class="card-heading"><div><h2>Economy by matchup</h2><p>Bowler runs conceded per six legal balls.</p></div></div><div class="chart-wrap"><canvas id="matchup-economy-chart" aria-label="Matchup economy chart"></canvas></div></article>
+          </div>
+          <article class="dashboard-card table-card">
+            <div class="card-heading table-heading"><div><h2>Bowler-batter records</h2><p id="matchup-count">Select a bowler to load records. Sample size is legal balls.</p></div><span class="chart-tag">SORTABLE</span></div>
+            <div class="table-scroll"><table id="matchup-table"><thead><tr><th><button class="table-sort" data-sort="batter_name" data-table="matchup" type="button">Batter</button></th><th><button class="table-sort" data-sort="batter_runs" data-table="matchup" type="button">Batter runs</button></th><th><button class="table-sort" data-sort="batter_strike_rate" data-table="matchup" type="button">Batter SR</button></th><th><button class="table-sort" data-sort="runs_conceded" data-table="matchup" type="button">Bowler runs</button></th><th><button class="table-sort" data-sort="wickets" data-table="matchup" type="button">Credited wickets</button></th><th><button class="table-sort" data-sort="economy" data-table="matchup" type="button">Economy</button></th><th><button class="table-sort" data-sort="bowling_strike_rate" data-table="matchup" type="button">Bowling SR</button></th><th><button class="table-sort" data-sort="legal_balls" data-table="matchup" type="button">Legal balls</button></th><th>Sample</th></tr></thead><tbody><tr><td colspan="9" class="table-state">Select a bowler to load matchup records.</td></tr></tbody></table></div>
+            <div class="table-footer"><span id="matchup-page-label">Page 1 of 1</span><div><button id="matchup-prev" class="button button-small button-secondary" type="button">Previous</button><button id="matchup-next" class="button button-small button-secondary" type="button">Next</button></div></div>
+          </article>
+        </section>
+
+        <section id="phase-analysis" class="analytics-panel" role="tabpanel" aria-labelledby="tab-phases" hidden>
+          <div class="filter-bar">
+            <label class="filter-control"><span>Bowler</span><select id="phase-bowler"><option value="">All bowlers</option></select></label>
+            <label class="filter-control"><span>Phase</span><select id="phase-select"><option value="">All phases</option></select></label>
+          </div>
+          <div id="phase-error" class="component-state" role="status" hidden></div>
+          <div class="chart-grid">
+            <article class="dashboard-card chart-card"><div class="card-heading"><div><h2>Economy by phase</h2><p>Average runs conceded per six legal balls; hover for sample size.</p></div></div><div class="chart-wrap"><canvas id="phase-economy-chart" aria-label="Bowling economy by phase"></canvas></div></article>
+            <article class="dashboard-card chart-card"><div class="card-heading"><div><h2>Credited wickets by phase</h2><p>Wickets attributed to the bowler, with legal-ball samples.</p></div></div><div class="chart-wrap"><canvas id="phase-wickets-chart" aria-label="Credited wickets by phase"></canvas></div></article>
+          </div>
+          <article class="dashboard-card table-card">
+            <div class="card-heading table-heading"><div><h2>Phase comparison records</h2><p>Sorted performance records and legal-ball samples.</p></div><span class="chart-tag">SORTABLE</span></div>
+            <div class="table-scroll"><table id="phase-table"><thead><tr><th><button class="table-sort" data-phase-sort="bowler_name" type="button">Bowler</button></th><th><button class="table-sort" data-phase-sort="phase" type="button">Phase</button></th><th><button class="table-sort" data-phase-sort="legal_balls" type="button">Legal balls</button></th><th><button class="table-sort" data-phase-sort="runs_conceded" type="button">Runs conceded</button></th><th><button class="table-sort" data-phase-sort="wickets" type="button">Credited wickets</button></th><th><button class="table-sort" data-phase-sort="economy" type="button">Economy</button></th><th><button class="table-sort" data-phase-sort="bowling_average" type="button">Bowling average</button></th><th><button class="table-sort" data-phase-sort="bowling_strike_rate" type="button">Bowling SR</button></th></tr></thead><tbody><tr><td colspan="8" class="table-state">Loading phase comparisons…</td></tr></tbody></table></div>
+          </article>
+        </section>
+
+        <section id="wicket-analysis" class="analytics-panel" role="tabpanel" aria-labelledby="tab-wickets" hidden>
+          <div class="filter-bar">
+            <label class="filter-control"><span>Bowler</span><select id="wicket-bowler"><option value="">All bowlers</option></select></label>
+            <label class="filter-control"><span>Phase</span><select id="wicket-phase"><option value="">All phases</option></select></label>
+            <label class="filter-control"><span>Season</span><select id="wicket-season"><option value="">All available seasons</option></select></label>
+            <label class="filter-control"><span>Dismissal type</span><select id="dismissal-filter"><option value="">All dismissal types</option></select></label>
+          </div>
+          <div id="wicket-error" class="component-state" role="status" hidden></div>
+          <div class="chart-grid">
+            <article class="dashboard-card chart-card"><div class="card-heading"><div><h2>Dismissal types</h2><p>Bowler-credited and other dismissals are shown separately.</p></div></div><div class="chart-wrap"><canvas id="wicket-type-chart" aria-label="Dismissal types split by credit"></canvas></div></article>
+            <article class="dashboard-card chart-card"><div class="card-heading"><div><h2>Credited wickets by bowler</h2><p>All dismissal filters applied; legal-ball sample shown where available.</p></div></div><div class="chart-wrap"><canvas id="wicket-bowler-chart" aria-label="Credited wickets by bowler"></canvas></div></article>
+          </div>
+          <article class="dashboard-card table-card">
+            <div class="card-heading table-heading"><div><h2>Dismissal records</h2><p id="wicket-count">Loading dismissal events…</p></div><span class="chart-tag">SORTABLE</span></div>
+            <div class="table-scroll"><table id="wicket-table"><thead><tr><th><button class="table-sort" data-sort="season" data-table="wicket" type="button">Season</button></th><th>Match</th><th><button class="table-sort" data-sort="over_phase" data-table="wicket" type="button">Phase</button></th><th><button class="table-sort" data-sort="bowler_name" data-table="wicket" type="button">Bowler</button></th><th>Dismissed batter</th><th><button class="table-sort" data-sort="kind" data-table="wicket" type="button">Dismissal</button></th><th><button class="table-sort" data-sort="is_bowler_credited" data-table="wicket" type="button">Credit</button></th></tr></thead><tbody><tr><td colspan="7" class="table-state">Loading dismissal events…</td></tr></tbody></table></div>
+            <div class="table-footer"><span id="wicket-page-label">Page 1 of 1</span><div><button id="wicket-prev" class="button button-small button-secondary" type="button">Previous</button><button id="wicket-next" class="button button-small button-secondary" type="button">Next</button></div></div>
+          </article>
+        </section>
+      </section>
+
+      <section id="decision-support" class="page-panel" aria-labelledby="decision-title" hidden>
+        <div id="coach" class="anchor-target"></div>
+        <div class="page-heading"><div><p class="eyebrow">HISTORICAL DECISION SUPPORT</p><h1 id="decision-title">Compare historical evidence</h1><p>Evidence-based comparisons from past aggregates; not a live match feed or autonomous coach.</p></div><span class="historical-pill">LOCAL · HISTORICAL</span></div>
+        <label class="filter-control decision-sample-control"><span>Minimum sample for comparison</span><select id="decision-min-balls"><option value="0">No minimum</option><option value="12">12 legal balls</option><option value="30" selected>30 legal balls</option><option value="60">60 legal balls</option><option value="120">120 legal balls</option></select></label>
+        <form id="recommendation-form" novalidate>
+          <section class="panel">
+            <div class="section-heading"><span class="step-number">01</span><div><h2>Set the historical scenario</h2><p>Select a phase, batter and optional match context.</p></div></div>
+            <div class="field-grid">
+              <label class="field"><span>Innings phase <b aria-hidden="true">*</b></span><select id="phase" required disabled><option value="">Loading phases…</option></select></label>
+              <div class="field"><label for="batter-search"><span>Batter <b aria-hidden="true">*</b></span></label><input id="batter-search" type="search" placeholder="Search historical batters by name or ID" autocomplete="off" disabled><div id="batter-results" class="lookup-results" aria-live="polite"><p class="empty-hint">Loading historical batter records…</p></div><div id="selected-batter" class="selected-batter" role="status">No batter selected.</div></div>
+            </div>
+            <details class="optional-context"><summary>Optional caller-supplied match context</summary><p class="field-hint">Context is returned with the result but does not affect historical scores.</p><div class="context-grid">
+              <label class="field"><span>Match ID</span><input id="match-id" type="text" maxlength="120" autocomplete="off"></label>
+              <label class="field"><span>Innings number</span><input id="innings-number" type="number" min="0" step="1"></label>
+              <label class="field"><span>Batting team</span><input id="batting-team" type="text" maxlength="120" autocomplete="off"></label>
+              <label class="field"><span>Bowling team</span><input id="bowling-team" type="text" maxlength="120" autocomplete="off"></label>
+              <label class="field"><span>Current over</span><input id="current-over" type="number" min="0" step="1"></label>
+            </div></details>
+          </section>
+          <section class="panel">
+            <div class="section-heading"><span class="step-number">02</span><div><h2>Choose eligible bowlers</h2><p>Search the historical bowler catalog and add up to 30 candidates.</p></div></div>
+            <label class="field search-field"><span>Find a bowler</span><input id="bowler-search" type="search" placeholder="Search by name or player ID" autocomplete="off" disabled></label>
+            <div id="bowler-results" class="bowler-results" aria-live="polite"><p class="empty-hint">Loading historical bowler records…</p></div>
+            <div class="selected-heading"><h3>Selected candidates <span id="candidate-count" class="count-badge">0</span></h3><p>Availability and remaining overs are supplied by you; they are not inferred from historical data.</p></div>
+            <div id="selected-candidates" class="selected-list"><p class="empty-hint">No bowlers selected yet.</p></div>
+          </section>
+          <section class="panel">
+            <div class="section-heading"><span class="step-number">03</span><div><h2>Add historical situation evidence</h2><p>Optional. Situation values come from the loaded historical aggregates.</p></div></div>
+            <label class="toggle-row"><input id="use-situation" type="checkbox" disabled><span>Include a historical situation comparison</span></label>
+            <div id="situation-fields" class="field-grid situation-grid" hidden><label class="field"><span>Situation type</span><select id="situation-type" disabled><option value="">Select a type</option></select></label><label class="field"><span>Historical value</span><select id="situation-value" disabled><option value="">Select a value</option></select></label></div>
+            <p class="field-hint">Situation evidence is for the selected category and value; the datasets do not always provide a phase-by-situation cross-tabulation. Missing matches are unavailable evidence, not poor performance.</p>
+          </section>
+          <div class="submit-row"><p id="form-message" class="form-message" role="status"></p><button id="submit-button" class="button button-primary" type="submit" disabled><span>Compare historical records</span><span aria-hidden="true">→</span></button></div>
+        </form>
+        <section id="results-section" class="results-section" aria-live="polite" hidden>
+          <div class="results-heading"><div><p class="eyebrow">HISTORICAL-DATA-BASED COMPARISON</p><h2>Evidence and results</h2></div><span class="historical-pill">HISTORICAL ONLY</span></div>
+          <div id="result-warnings" class="result-warnings"></div><p id="scenario-summary" class="scenario-summary"></p>
+          <aside class="score-guidance" aria-label="How to read comparison scores"><strong>How to read these scores</strong><p>Scores are relative to the eligible bowlers in this request, not probabilities. Each metric is normalized against that set, then evidence is shrunk toward neutral according to its sample size. Available metrics and evidence sources are reweighted; missing evidence is omitted, not scored as poor performance.</p></aside>
+          <div id="recommendations" class="recommendation-list"></div>
+          <div id="excluded-section" class="excluded-section" hidden><h3>Not ranked</h3><div id="excluded-list"></div></div>
+        </section>
+      </section>
+      <footer class="dashboard-footer">CRIC · Historical aggregates only · No live match feed · Processing infrastructure is not accessed by the browser</footer>
+    </main>
+  </body>
+</html>

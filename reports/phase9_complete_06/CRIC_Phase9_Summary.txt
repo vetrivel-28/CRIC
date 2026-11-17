@@ -1,0 +1,43 @@
+CRIC PHASE 9 — HISTORICAL EVALUATION
+Date: 2026-10-12 | Project: C:\CRIC
+
+FINAL STATUS
+C — EVALUATION REMAINS BLOCKED. Leakage-safe raw-history feature reconstruction was implemented and independently formula-checked, but candidate eligibility and a defensible outcome target remain unresolved. No historical predictive metrics were calculated.
+
+WHAT WAS COMPLETED
+- Current Phase 9 feasibility evidence and project state rechecked; full baseline before changes: 68 passed in 55.03s.
+- Separate streaming raw-data feature builder created for career, source-labelled phase, batter matchup, phase matchup, and situation buckets. Its cutoff is strictly match_date < decision date and excludes same-day matches.
+- Current full-history aggregates are not accepted as feature-builder inputs.
+- Data-quality audit found all wicket event keys map to deliveries, preserves multiple event rows per ball, validates charged-run and legal-delivery fields, investigates XI anomalies, and flags format metadata.
+- Formula validation compares independent second-pass real historical career/phase/matchup totals against the builder. Synthetic zero-ball tests are marked as fixtures only.
+- Candidate eligibility: Matches in source: 4230; admitted eligible matches: 0; decision scenarios: 0. Roster inclusion/availability, decision-time quota state, and counterfactual alternative outcomes are not established by local source fields.
+
+SOURCE FACTS
+Matches: 4230 from 2008-04-18 through 2026-07-13; deliveries: 966985; legal deliveries: 925882; wicket events: 53294; bowler-credited wicket events: 48983.
+Match-playing-XI row counts: {"21": 5, "22": 3922, "23": 37, "24": 260, "25": 6}. Duplicate match/player rows: 1; player assigned to multiple teams: 1; unique roster IDs absent from all deliveries: 96; unique roster IDs with missing bowls_flag: 663.
+Seven T20-labelled records have overs=50, yet observed maximum over is 19. They are excluded in protocol splits and the feature-validation snapshot. XI source lineage was not found locally.
+
+LEAKAGE-SAFE FEATURE DEFINITIONS
+Legal balls use the source is_legal_delivery flag. Charged runs include runs_batter + extra_wides + extra_noballs for legal and illegal deliveries; byes, leg-byes, and penalty runs are excluded. Bowler-credited wickets come from wicket_events joined by match/innings/over/ball and are counted event-by-event. Economy = 6 * charged runs / legal balls; bowling strike rate = legal balls / credited wickets; wicket rate = credited wickets * 100 / legal balls. Zero denominators remain null. Phase labels are preserved from deliveries.csv; no undocumented over-based recoding is applied.
+
+EVALUATION PROTOCOL
+Chronological unique-date splits are 60% development, 20% validation, 20% final holdout. Exact dates and match IDs are recorded in CRIC_Phase9_Chronological_Splits.json and embedded in the protocol. Feature history uses strictly earlier dates, excluding all matches on the same date. Fixed production weights are recorded and unchanged. Intended comparisons are the fixed current CRIC scorer, career-only, and phase-only on identical candidate scenarios; no candidate scenarios were admitted, so no results are produced.
+
+WHY PREDICTIVE METRICS ARE BLOCKED
+The local XI file has only match/team/player IDs and no source lineage or availability status. Its variable counts (21–25), one cross-team duplicate, 5,189 rows without any delivery participation, 96 IDs absent from all deliveries, and 663 unique roster IDs with missing bowling flags prevent an evidence-based decision-time eligible pool. Match outcomes are observed for the selected bowler only; no counterfactual outcomes for unused alternatives or historical recommender decision are recorded. Ranking results would be selection-biased or rely on unsupported assumptions.
+
+FORMULA AND DATA QUALITY FINDINGS
+All 53294 wicket event rows joined to delivery keys; 4 keys contain multiple wicket events; 0 event/delivery bowler mismatches. 41103 delivery rows contain wides/no-balls; illegal flag inconsistencies: 0 legal rows with wides/no-balls and 0 illegal rows without either. Runs-extras formula mismatches: 0.
+Phase 2 fallback code filters deliveries to legal rows before summing runs_batter + wides + no-balls. This omits charged runs on illegal wide/no-ball deliveries. The isolated feature builder uses the source-standard charged-run sum across every delivery. No production code, existing aggregates, or datasets were changed.
+
+UNCERTAINTY AND LIMITATIONS
+No confidence intervals or statistical tests were calculated because there are no valid matched decision/outcome scenarios. The PDF includes a descriptive roster-size chart only; no predictive chart is produced. The system remains a deterministic historical-data prototype, not a trained model or validated predictor.
+
+NEXT ACTIONS
+1. Obtain authoritative match_playing_xi.csv semantics, replacement/substitute status, and decision-time availability.
+2. Obtain match-specific quota/eligibility state and define the recommendation decision timestamp.
+3. Define a valid target that addresses outcomes observed only for selected bowlers; pre-register metrics and baselines before opening final holdout results.
+4. Resolve source phase-generation provenance and the seven overs metadata conflicts.
+5. Only then execute a chronological holdout evaluation and match-level uncertainty analysis.
+
+Files are listed in CRIC_Phase9_Reproducibility.json. No predictive metrics were calculated.

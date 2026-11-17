@@ -1,0 +1,8 @@
+﻿risk_id,severity,risk,evidence,mitigation
+R10-01,BLOCKER,Roster semantics and decision-time availability are not established.,match_playing_xi contains only four identity columns; 5189 rows lack same-match delivery participation.,"Acquire source documentation and time-stamped announced lineup, substitutes, replacements, and availability."
+R10-02,BLOCKER,Quota/rules eligibility cannot be reconstructed.,No quota state at the proposed decision point; seven T20/overs metadata anomalies.,Acquire format ruleset and decision-time legal overs remaining/penalty state.
+R10-03,BLOCKER,Outcomes for unused candidates are unobserved.,Raw deliveries identify the actual bowler only.,Use prospective shadow logging for decisions; no retrospective imputation of alternative outcomes.
+R10-04,HIGH,Potential post-decision leakage if eventual participation is used as eligibility.,"Delivery participation is an outcome after selection, not a recorded availability event.",Enforce explicit decision-time evidence states and strict as-of feature construction.
+R10-05,HIGH,Source and license provenance incomplete.,Ingestion manifest has local hashes/timestamps but no source URL or license.,"Obtain original source packages, citations, license, extraction logs, and stable player/team ID dictionaries."
+R10-06,MEDIUM,Cross-team roster conflict and variable roster sizes.,One cross-team duplicate; match roster rows 21-25 and team rows 10-13.,Flag conflicts; no source-row deletion or automatic correction.
+R10-07,MEDIUM,Role flags are incomplete and undated.,3903 roster rows and 663 unique players have missing bowls_flag.,Acquire dated role-source fields; do not derive role from observed bowling.

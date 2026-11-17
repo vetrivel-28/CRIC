@@ -1,0 +1,88 @@
+{
+  "candidate_rule": "Eligibility is unknown unless independently evidenced for team membership, decision-time availability, and permission to bowl; role is an additional required concept only where the target protocol requires it.",
+  "causal_policy": "No causal benefit claims from retrospective or shadow observational comparisons.",
+  "counterfactual_evaluation": "BLOCKED",
+  "decision_time_rule": "Pre-decision features must use only records available before the decision; same-match prior deliveries require a timestamp/order and must not include the current or future delivery.",
+  "descriptive_analysis": "Permitted for outcomes actually observed for the historical bowler; do not treat them as labels for alternatives.",
+  "evaluation_gate": {
+    "blockers": [
+      "decision-time eligible candidate universe is unsupported",
+      "decision-time features for an intra-match selection are not established",
+      "outcomes are not observed for every eligible candidate"
+    ],
+    "decision_time_features_supported": false,
+    "eligible_candidate_universe_supported": false,
+    "labels_observed_for_all_candidates": false,
+    "metrics": {},
+    "status": "BLOCKED"
+  },
+  "final_holdout_ranking_metrics_computed": false,
+  "five_designs": [
+    {
+      "current_status": "FEASIBLE_WITH_LIMITS",
+      "design": "Historical descriptive analysis",
+      "evidence": "Raw deliveries, innings, matches, and wicket events have joinable match/innings/delivery keys; legal-ball and charged-run fields are present.",
+      "limitation": "Describes selected historical usage only; usage selection is non-random and does not represent unused candidates.",
+      "permitted_claim": "Descriptive historical summaries only; no future-prediction or causal claim.",
+      "supported_question": "What happened to the bowler actually used, over the observed deliveries?"
+    },
+    {
+      "current_status": "BLOCKED",
+      "design": "Retrospective ranking evaluation",
+      "evidence": "No documented decision-time candidate list, availability, quota state, or past recommendation record.",
+      "limitation": "Playing-XI semantics and outcome labels for unused alternatives are unsupported.",
+      "permitted_claim": "None for ranking quality until candidate and label evidence is supplied.",
+      "supported_question": "Could CRIC rank the historical eligible alternatives at a recorded decision point?"
+    },
+    {
+      "current_status": "BLOCKED",
+      "design": "Counterfactual evaluation",
+      "evidence": "Observed outcomes belong to actual delivery bowlers; no alternative-bowler outcomes or randomization/causal design.",
+      "limitation": "Unobserved potential outcomes cannot be set to zero or inferred from the unused-player record.",
+      "permitted_claim": "No counterfactual or causal claim.",
+      "supported_question": "What would have happened if a different bowler had been selected?"
+    },
+    {
+      "current_status": "FEASIBLE_AFTER_INSTRUMENTATION",
+      "design": "Prospective shadow evaluation",
+      "evidence": "Local loopback recommender exists, but no immutable event log of decision state, candidates, recommendation, and actual selection was found.",
+      "limitation": "Shadow logging alone observes outcomes only for the selected bowler; ranking relevance needs a predeclared target and complete candidate snapshots.",
+      "permitted_claim": "Prospective reliability/coverage and descriptive association, not recommendation effect.",
+      "supported_question": "What recommendations would CRIC make on future decision snapshots without influencing selection?"
+    },
+    {
+      "current_status": "NOT_READY",
+      "design": "Prospective intervention evaluation",
+      "evidence": "No approved intervention, allocation protocol, governance, safety monitoring, or causal analysis plan.",
+      "limitation": "Requires prospective design and operational oversight; observational outcome differences do not establish benefit.",
+      "permitted_claim": "Only after a preregistered controlled design and governance review.",
+      "supported_question": "Does using CRIC recommendations change outcomes?"
+    }
+  ],
+  "historical_ranking_evaluation": "BLOCKED",
+  "holdout_policy": "Do not compute final-holdout ranking metrics until candidate universe, decision time, target, and metrics are specified and frozen.",
+  "metrics": {},
+  "outcome_rule": "A complete observed over may be summarized for its actual bowler only; incomplete horizons are unavailable, and unused candidates have no outcome labels.",
+  "phase9_baseline": {
+    "excluded_format_anomalies": [
+      "2020-03-04_M1",
+      "2020-03-06_M2",
+      "2025-02-20_M1",
+      "2025-02-21_M2",
+      "2025-02-23_M3",
+      "2025-09-17_M1",
+      "2025-09-21_M3"
+    ],
+    "formula_checks": 6,
+    "phase9_tests": "32 passed in 0.26s",
+    "regression_tests": "68 passed in 69.11s",
+    "split_sizes": {
+      "development": 2117,
+      "final_holdout": 1105,
+      "validation": 1001
+    },
+    "unique_matches": 4223
+  },
+  "primary_status": "B \u2014 LIMITED DESCRIPTIVE EVALUATION ONLY",
+  "split_policy": "All matches on a date remain in one split; features use only dates strictly earlier than the decision date."
+}

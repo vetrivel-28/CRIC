@@ -1,0 +1,99 @@
+{
+  "artifacts": [
+    "CRIC_Phase10_Audit_Report.pdf",
+    "CRIC_Phase10_Candidate_Eligibility_Audit.csv",
+    "CRIC_Phase10_Chronological_Protocol.json",
+    "CRIC_Phase10_Evaluation_Feasibility.csv",
+    "CRIC_Phase10_Outcome_Definitions.csv",
+    "CRIC_Phase10_Provenance_Findings.csv",
+    "CRIC_Phase10_Required_Additional_Data.csv",
+    "CRIC_Phase10_Risk_Register.csv",
+    "CRIC_Phase10_Roster_Anomalies.csv",
+    "CRIC_Phase10_Source_Hash_Check.csv",
+    "CRIC_Phase10_Source_Inventory.csv",
+    "CRIC_Phase10_Summary.txt",
+    "CRIC_Phase10_Test_Results.txt"
+  ],
+  "data_file_count_hashed_before_after": 42,
+  "evaluation_gate": {
+    "blockers": [
+      "decision-time eligible candidate universe is unsupported",
+      "decision-time features for an intra-match selection are not established",
+      "outcomes are not observed for every eligible candidate"
+    ],
+    "decision_time_features_supported": false,
+    "eligible_candidate_universe_supported": false,
+    "labels_observed_for_all_candidates": false,
+    "metrics": {},
+    "status": "BLOCKED"
+  },
+  "generated_at_utc": "2026-10-12T11:56:19.433574+00:00",
+  "historical_ranking_evaluation": "BLOCKED",
+  "limitations": [
+    "Playing-XI source origin, license, official status, and semantic meaning are not established.",
+    "Decision-time availability and bowling-quota state are absent.",
+    "Outcomes are observed only for actual historical bowlers.",
+    "No retrospective ranking, counterfactual, causal, or final-holdout metrics were calculated."
+  ],
+  "phase10_script_sha256": {
+    "evaluation/phase10/__init__.py": "c04cce375d8c7092e9d8bd011c30adff10589517d629cb989f41494124e43fbe",
+    "evaluation/phase10/audit.py": "d4f10cc839459f888e04786961f5092e6d6915db873fdde4260ed6b0c22e7638",
+    "evaluation/phase10/decision.py": "126993f4c0d491a2ec686d559be13dbc7dee99da57318be1cd3782a074cf6374",
+    "evaluation/phase10/protocol.py": "7f09edc1b3d396acdeb74e2a6995655d33f91fd03ab7e162b3bb5b00bf68e297",
+    "evaluation/phase10/run_phase10.py": "23dc089d59155c20ee394d94596f444be5b664bd51fabec4f1dfc969a78cd753",
+    "evaluation/phase10/tests/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evaluation/phase10/tests/test_audit.py": "b62ebcd67d33151d715e5aaa3da9d7decf4e1768fc14f11505566de94f371200",
+    "evaluation/phase10/tests/test_decision.py": "841f3bdb8954460a0843efa0253397e0e381bb877a88b4f78496dfba04be4f6a",
+    "evaluation/phase10/tests/test_protocol.py": "e2e4f1fa2d838c13970d14980946731974b469017150736288556bb5ea1c8570"
+  },
+  "phase10_test_result": "12 passed in 0.21s",
+  "phase9_baseline": {
+    "excluded_format_anomalies": [
+      "2020-03-04_M1",
+      "2020-03-06_M2",
+      "2025-02-20_M1",
+      "2025-02-21_M2",
+      "2025-02-23_M3",
+      "2025-09-17_M1",
+      "2025-09-21_M3"
+    ],
+    "formula_checks": 6,
+    "phase9_tests": "32 passed in 0.26s",
+    "regression_tests": "68 passed in 69.11s",
+    "split_sizes": {
+      "development": 2117,
+      "final_holdout": 1105,
+      "validation": 1001
+    },
+    "unique_matches": 4223
+  },
+  "phase9_source_sha256": {
+    "C:\\CRIC\\data\\CRIC_bowler_career_performance_v1-20261012T042830Z-1-001\\CRIC_bowler_career_performance_v1\\bowler_career_performance_v1.csv": "73b8ba1e76b8299d647788da86eda0c446abd555818d2cb498780b7ee0f71a01",
+    "C:\\CRIC\\data\\CRIC_bowler_phase_performance_v1-20261012T042831Z-1-001\\CRIC_bowler_phase_performance_v1\\bowler_phase_performance_v1.csv": "08de9ea46328b427f81cc76bda5ddd788fd137e09aedf936ce758b58ea6f0861",
+    "C:\\CRIC\\data\\bowler_matchup_situation_Dataset-20261012T042831Z-1-001\\bowler_matchup_situation_Dataset\\bowler_batter_matchup_stats_v2.csv": "5042d98095545e8dca1b4a123141fa7271f7e5f4227a8de8ac02001b24c05a91",
+    "C:\\CRIC\\data\\bowler_matchup_situation_Dataset-20261012T042831Z-1-001\\bowler_matchup_situation_Dataset\\bowler_situation_stats_v2.csv": "2d868103ae00f19f8c7fdb1aaa52f85e65bd063fca5c8ca2448a31eff4c1ac52",
+    "C:\\CRIC\\data\\merged_cricket_data-20261012T042833Z-1-001\\merged_cricket_data\\combined_data.csv": "88f053504a2bdcf55c2ec77b0e33642fc7a7cc8ba1cc200fe2cbbe62b6832433",
+    "C:\\CRIC\\data\\merged_cricket_data-20261012T042833Z-1-001\\merged_cricket_data\\deliveries.csv": "c6ddfd575a5aba9ceb0f68084688f1de6350ebae6db309d55b7bb78c77b05d7a",
+    "C:\\CRIC\\data\\merged_cricket_data-20261012T042833Z-1-001\\merged_cricket_data\\innings.csv": "96d597d3a77b2d98634324111fd59846c710894a3912cef89a1f10eae95c1ec4",
+    "C:\\CRIC\\data\\merged_cricket_data-20261012T042833Z-1-001\\merged_cricket_data\\match_playing_xi.csv": "d7693c8b3fbc3664f4faf57930e7ba2c80b1beafd2cd809e8c421921082765b8",
+    "C:\\CRIC\\data\\merged_cricket_data-20261012T042833Z-1-001\\merged_cricket_data\\matches.csv": "f830dbfbbfe3a69f15009b9f0f6657a40f61a2c2c677fcaa6356d54d4b7a0f86",
+    "C:\\CRIC\\data\\merged_cricket_data-20261012T042833Z-1-001\\merged_cricket_data\\players.csv": "04699df252148674907b9ca3ec19edde1b9a033fca0cd87c1cc35b68336681b2",
+    "C:\\CRIC\\data\\wickets_derived_Dataset-20261012T042841Z-1-001\\wickets_derived_Dataset\\wicket_events.csv": "d3adaf9e34776985593896095a27f3596b2bf54e7afb2b7dc68573265a2a7984"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "primary_status": "B \u2014 LIMITED DESCRIPTIVE EVALUATION ONLY",
+  "project_root": "C:\\CRIC",
+  "python_version": "3.13.13 (tags/v3.13.13:01104ce, Apr  7 2026, 19:25:48) [MSC v.1944 64 bit (AMD64)]",
+  "regression_test_result": "68 passed in 58.21s",
+  "run_id": "20261012T115559Z",
+  "source_counts": {
+    "bowler_credited_wickets": 48983,
+    "deliveries": 966985,
+    "legal_deliveries": 925882,
+    "matches": 4230,
+    "roster_matches": 4230,
+    "roster_rows": 93630,
+    "wicket_events": 53294
+  },
+  "source_hashes_unchanged": true
+}

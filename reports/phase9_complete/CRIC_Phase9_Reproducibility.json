@@ -1,0 +1,143 @@
+{
+  "status": "BLOCKED_BEFORE_PREDICTIVE_EVALUATION",
+  "generated_date": "2026-11-17",
+  "project_root": "C:\\CRIC",
+  "python_version": "3.13.13 (tags/v3.13.13:01104ce, Apr  7 2026, 19:25:48) [MSC v.1944 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "sources": {
+    "matches.csv": {
+      "path": "C:\\CRIC\\data\\raw\\matches.csv",
+      "sha256": "f830dbfbbfe3a69f15009b9f0f6657a40f61a2c2c677fcaa6356d54d4b7a0f86",
+      "rows": 4230
+    },
+    "innings.csv": {
+      "path": "C:\\CRIC\\data\\raw\\innings.csv",
+      "sha256": "96d597d3a77b2d98634324111fd59846c710894a3912cef89a1f10eae95c1ec4",
+      "rows": 8495
+    },
+    "deliveries.csv": {
+      "path": "C:\\CRIC\\data\\raw\\deliveries.csv",
+      "sha256": "c6ddfd575a5aba9ceb0f68084688f1de6350ebae6db309d55b7bb78c77b05d7a",
+      "rows": 966985
+    },
+    "players.csv": {
+      "path": "C:\\CRIC\\data\\raw\\players.csv",
+      "sha256": "04699df252148674907b9ca3ec19edde1b9a033fca0cd87c1cc35b68336681b2",
+      "rows": 5261
+    },
+    "match_playing_xi.csv": {
+      "path": "C:\\CRIC\\data\\raw\\match_playing_xi.csv",
+      "sha256": "d7693c8b3fbc3664f4faf57930e7ba2c80b1beafd2cd809e8c421921082765b8",
+      "rows": 93630
+    },
+    "combined_data.csv": {
+      "path": "C:\\CRIC\\data\\raw\\combined_data.csv",
+      "sha256": "88f053504a2bdcf55c2ec77b0e33642fc7a7cc8ba1cc200fe2cbbe62b6832433",
+      "rows": 5261
+    },
+    "wicket_events.csv": {
+      "path": "C:\\CRIC\\data\\derived\\wicket_events.csv",
+      "sha256": "d3adaf9e34776985593896095a27f3596b2bf54e7afb2b7dc68573265a2a7984",
+      "rows": 53294
+    },
+    "bowler_career_performance_v1.csv": {
+      "path": "C:\\CRIC\\data\\derived\\bowler_career_performance_v1.csv",
+      "sha256": "73b8ba1e76b8299d647788da86eda0c446abd555818d2cb498780b7ee0f71a01",
+      "rows": 3190
+    },
+    "bowler_phase_performance_v1.csv": {
+      "path": "C:\\CRIC\\data\\derived\\bowler_phase_performance_v1.csv",
+      "sha256": "08de9ea46328b427f81cc76bda5ddd788fd137e09aedf936ce758b58ea6f0861",
+      "rows": 7976
+    },
+    "bowler_batter_matchup_stats_v2.csv": {
+      "path": "C:\\CRIC\\data\\derived\\bowler_batter_matchup_stats_v2.csv",
+      "sha256": "5042d98095545e8dca1b4a123141fa7271f7e5f4227a8de8ac02001b24c05a91",
+      "rows": 131294
+    },
+    "bowler_situation_stats_v2.csv": {
+      "path": "C:\\CRIC\\data\\derived\\bowler_situation_stats_v2.csv",
+      "sha256": "2d868103ae00f19f8c7fdb1aaa52f85e65bd063fca5c8ca2448a31eff4c1ac52",
+      "rows": 101163
+    }
+  },
+  "script_sha256": {
+    "C:\\CRIC\\evaluation\\phase9\\__init__.py": "a31cd2e0856564ebb0380778d345eb47ce3ac418a34c63f7f9c5e1a208e6177c",
+    "C:\\CRIC\\evaluation\\phase9\\candidate_eligibility.py": "c87cb897b9a33875c5285a402d8e0be1910b894be0d69cad38241919e2ece6dd",
+    "C:\\CRIC\\evaluation\\phase9\\data_quality.py": "14fd26987c2c89460b402b414ae2f060878888508751ae2883e890ebe6e2e5c2",
+    "C:\\CRIC\\evaluation\\phase9\\historical_features.py": "b2576085f5f193f75429d4928903030130855b3f37f98ebeb95953b1e790bc8f",
+    "C:\\CRIC\\evaluation\\phase9\\metrics.py": "0dba851e9cee44bc081caca87cf800ba95ca8128a6f81ebfab4d0d620c0d4544",
+    "C:\\CRIC\\evaluation\\phase9\\protocol.py": "e4efa2db1cfd6d5569d24bf9cd00bad47e2d4be650bac2c1a66c8d696850e260",
+    "C:\\CRIC\\evaluation\\phase9\\run_phase9.py": "5811cf1e3323a5ac33f447c379c3d9c5d3dd78a76658a9ecba91499c1bc2027d",
+    "C:\\CRIC\\evaluation\\phase9\\scoring.py": "6eeae025ff6496e2dd8ea1cecc3915cf1749e355f3b34cd503cd01eaaea86573",
+    "C:\\CRIC\\evaluation\\phase9\\tests\\test_eligibility_metrics.py": "e0541edefbab2ed31a992769e725c4786de18f3c2b6f43d5695bdc787cb975c9",
+    "C:\\CRIC\\evaluation\\phase9\\tests\\test_historical_features.py": "1bd3df755f8e1931c6578b1052364af93b27a5c6c72b3e9b8918f67c07ca4fe1",
+    "C:\\CRIC\\evaluation\\phase9\\tests\\test_scoring_protocol.py": "7e9e78b488eaf954523ce7b06d570b3b44843ea8adc1b0120cbfbb6fe96b11ca"
+  },
+  "evaluation_settings": {
+    "feature_validation_cutoff": "2020-01-01",
+    "feature_inputs": [
+      "matches.csv",
+      "deliveries.csv",
+      "wicket_events.csv"
+    ],
+    "excluded_match_ids": [
+      "2020-03-04_M1",
+      "2020-03-06_M2",
+      "2025-02-20_M1",
+      "2025-02-21_M2",
+      "2025-02-23_M3",
+      "2025-09-17_M1",
+      "2025-09-21_M3"
+    ],
+    "no_final_holdout_metrics": true,
+    "random_seed": 20261012
+  },
+  "splits": {
+    "development": {
+      "start_date": "2008-04-18",
+      "end_date": "2023-02-28",
+      "match_count": 2117,
+      "unique_dates": 1275
+    },
+    "validation": {
+      "start_date": "2023-03-02",
+      "end_date": "2024-12-02",
+      "match_count": 1001,
+      "unique_dates": 425
+    },
+    "final_holdout": {
+      "start_date": "2024-12-03",
+      "end_date": "2026-07-13",
+      "match_count": 1105,
+      "unique_dates": 425
+    }
+  },
+  "test_outcomes": {
+    "baseline_full_suite": "68 passed in 55.03s",
+    "dedicated_phase9": "32 passed in 0.26s",
+    "final_full_suite": "68 passed in 69.11s"
+  },
+  "artifacts": [
+    "CRIC_Phase9_Candidate_Eligibility.csv",
+    "CRIC_Phase9_Chronological_Splits.json",
+    "CRIC_Phase9_Data_Inventory.csv",
+    "CRIC_Phase9_Evaluation_Protocol.json",
+    "CRIC_Phase9_Evaluation_Results.csv",
+    "CRIC_Phase9_Feasibility_Results.csv",
+    "CRIC_Phase9_Feature_Provenance.csv",
+    "CRIC_Phase9_Findings.csv",
+    "CRIC_Phase9_Formula_Validation.csv",
+    "CRIC_Phase9_Historical_Evaluation_Report.pdf",
+    "CRIC_Phase9_Match_Level_Results.csv",
+    "CRIC_Phase9_Metric_Dictionary.csv",
+    "CRIC_Phase9_Roster_Size_Distribution.svg",
+    "CRIC_Phase9_Summary.txt",
+    "CRIC_Phase9_Test_Results.txt"
+  ],
+  "limitations": [
+    "No validated candidate set or observed counterfactual outcomes; no predictive metrics.",
+    "match_playing_xi.csv source semantics unavailable locally.",
+    "Phase boundaries are preserved from supplied labels because the generation rule is unavailable."
+  ]
+}

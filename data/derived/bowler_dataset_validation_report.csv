@@ -1,0 +1,13 @@
+check,result
+matchup_original_rows,131294
+matchup_v2_rows,131294
+matchup_duplicate_keys_v2,0
+matchup_zero_ball_rows,111
+matchup_dot_pct_recalculation_mismatches,0
+matchup_wicket_rate_mismatches,0
+situation_original_rows,101205
+situation_v2_rows,101163
+situation_duplicate_keys_v2,0
+situation_zero_ball_rows,19
+situation_duplicate_rows_removed,42
+common_bowlers,3190

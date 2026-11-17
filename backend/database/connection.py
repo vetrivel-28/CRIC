@@ -12,6 +12,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Generator, Iterator, Sequence
 
+from config.config_loader import load_db_config
+
 LOGGER = logging.getLogger("cric.database")
 
 # Default connection parameters (can be overridden via environment variables or .env)
@@ -44,12 +46,13 @@ class DatabaseConfig:
 
 
 def get_config_from_env() -> DatabaseConfig:
+    config = load_db_config()
     return DatabaseConfig(
-        host=os.getenv("CRIC_DB_HOST", os.getenv("PGHOST", DEFAULT_HOST)),
-        port=int(os.getenv("CRIC_DB_PORT", os.getenv("PGPORT", str(DEFAULT_PORT)))),
-        database=os.getenv("CRIC_DB_NAME", os.getenv("PGDATABASE", DEFAULT_DATABASE)),
-        user=os.getenv("CRIC_DB_USER", os.getenv("PGUSER", DEFAULT_USER)),
-        password=os.getenv("CRIC_DB_PASSWORD", os.getenv("PGPASSWORD", DEFAULT_PASSWORD)),
+        host=os.getenv("CRIC_DB_HOST", os.getenv("PGHOST", config["host"])),
+        port=int(os.getenv("CRIC_DB_PORT", os.getenv("PGPORT", str(config["port"])))),
+        database=os.getenv("CRIC_DB_NAME", os.getenv("PGDATABASE", config["dbname"])),
+        user=os.getenv("CRIC_DB_USER", os.getenv("PGUSER", config["user"])),
+        password=os.getenv("CRIC_DB_PASSWORD", os.getenv("PGPASSWORD", config["password"])),
     )
 
 
@@ -91,15 +94,18 @@ class DatabaseConnection:
             conn.close()
 
     @contextmanager
-    def cursor(self) -> Generator[Any, None, None]:
-        """Provides a managed psycopg cursor within a connection."""
+    def cursor(self, *, read_only: bool = False) -> Generator[Any, None, None]:
+        """Provides a managed cursor, optionally enforcing a read-only transaction."""
         with self.connect() as conn:
+            if read_only:
+                with conn.cursor() as setup_cursor:
+                    setup_cursor.execute("SET TRANSACTION READ ONLY")
             with conn.cursor() as cur:
                 yield cur
 
     def execute_query(self, query: str, params: Sequence[Any] | None = None) -> list[tuple]:
         """Executes a read-only query and returns all rows."""
-        with self.cursor() as cur:
+        with self.cursor(read_only=True) as cur:
             cur.execute(query, params or ())
             return cur.fetchall()
 

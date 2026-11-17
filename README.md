@@ -255,9 +255,24 @@ Run the automated Python test suite:
 python -m pytest tests/ evaluation/
 ```
 
+## 17. Running the local application
+
+The application uses PostgreSQL analytics by default and fails clearly if the
+database is unavailable; it does not silently substitute CSV results:
+```cmd
+python -m backend.api --source postgres --port 8765
+```
+Connection settings are read from `CRIC_DB_*` environment variables, then
+`PG*` variables, then the optional untracked `config/database.ini`.
+For an explicit offline run against local data:
+```cmd
+python -m backend.api --source csv --data-root data --port 8765
+```
+The CSV mode does not provide the PostgreSQL batter-career view.
+
 ---
 
-## 17. Power BI Integration Status
+## 18. Power BI Integration Status
 
 - **Status**: **Prepared for Direct Connection (Dashboard Development Pending)**.
 - **Specifications**: [powerbi/README.md](file:///C:/CRIC/powerbi/README.md) details the star schema relationships and connection settings.
@@ -265,7 +280,7 @@ python -m pytest tests/ evaluation/
 
 ---
 
-## 18. Repository Structure
+## 19. Repository Structure
 
 ```
 CRIC/
@@ -281,6 +296,7 @@ CRIC/
 ├── backend/
 │   ├── api.py                          # Local HTTP decision-support API
 │   ├── dashboard_data.py               # Analytical aggregation adapter
+│   ├── postgres_dashboard_data.py      # PostgreSQL analytics dashboard adapter
 │   ├── recommendation_engine.py        # Tactical bowler recommendation scoring engine
 │   ├── analytics/                      # Backward-compatible package shim
 │   ├── recommendation/                 # Backward-compatible package shim

@@ -1,8 +1,7 @@
-// ============================================================================
-// CRIC ANALYTICS: Power BI DAX Measures Library
-// ============================================================================
+// CRIC Premium Ivory + Emerald semantic-model measures.
+// Runs conceded exclude byes, leg-byes, and penalty runs; credited wickets
+// follow fact_wicket[is_bowler_credited].
 
-// 1. Bowling Volume
 Legal Balls =
 CALCULATE(
     COUNTROWS(fact_delivery),
@@ -10,21 +9,25 @@ CALCULATE(
 )
 
 Overs Bowled =
-DIVIDE([Legal Balls], 6, 0)
+DIVIDE([Legal Balls], 6, BLANK())
 
-// 2. Runs and Conceded Metrics
 Runs Conceded =
 SUMX(
     fact_delivery,
-    fact_delivery[runs_batter] + fact_delivery[extra_wides] + fact_delivery[extra_noballs]
+    COALESCE(fact_delivery[runs_batter], 0)
+        + COALESCE(fact_delivery[extra_wides], 0)
+        + COALESCE(fact_delivery[extra_noballs], 0)
 )
 
 Dot Balls =
 CALCULATE(
     COUNTROWS(fact_delivery),
     fact_delivery[is_legal_delivery] = TRUE(),
-    (fact_delivery[runs_batter] + fact_delivery[extra_wides] + fact_delivery[extra_noballs]) = 0
+    fact_delivery[runs_total] = 0
 )
+
+Dot Ball Percentage =
+DIVIDE([Dot Balls], [Legal Balls], BLANK()) * 100
 
 Fours Conceded =
 CALCULATE(
@@ -38,57 +41,108 @@ CALCULATE(
     fact_delivery[runs_batter] = 6
 )
 
-Boundaries Conceded = [Fours Conceded] + [Sixes Conceded]
+Boundaries Conceded =
+[Fours Conceded] + [Sixes Conceded]
 
-// 3. Wickets
+Boundary Percentage =
+DIVIDE([Boundaries Conceded], [Legal Balls], BLANK()) * 100
+
 Credited Wickets =
 CALCULATE(
     COUNTROWS(fact_wicket),
     fact_wicket[is_bowler_credited] = TRUE()
 )
 
-Total Wickets Involving Bowler =
+Total Wicket Events =
 COUNTROWS(fact_wicket)
 
-// 4. Rate Metrics (with NULL/BLANK division safeguards)
+Uncredited Wicket Events =
+[Total Wicket Events] - [Credited Wickets]
+
 Economy Rate =
-DIVIDE(
-    [Runs Conceded],
-    [Overs Bowled],
-    BLANK()
-)
+DIVIDE([Runs Conceded], [Overs Bowled], BLANK())
 
 Bowling Average =
-DIVIDE(
-    [Runs Conceded],
-    [Credited Wickets],
-    BLANK()
-)
+DIVIDE([Runs Conceded], [Credited Wickets], BLANK())
 
 Bowling Strike Rate =
+DIVIDE([Legal Balls], [Credited Wickets], BLANK())
+
+Wicket Rate per 100 Legal Balls =
+DIVIDE([Credited Wickets] * 100, [Legal Balls], BLANK())
+
+Matchup Legal Balls =
+SUM(v_bowler_batter_matchups[balls])
+
+Matchup Runs Conceded =
+SUM(v_bowler_batter_matchups[runs_conceded_by_bowler])
+
+Matchup Batter Runs =
+SUM(v_bowler_batter_matchups[runs_scored_by_batter])
+
+Matchup Credited Wickets =
+SUM(v_bowler_batter_matchups[wickets])
+
+Matchup Economy =
+DIVIDE([Matchup Runs Conceded] * 6, [Matchup Legal Balls], BLANK())
+
+Matchup Sample Weight =
+MIN(1, DIVIDE([Matchup Legal Balls], 30, 0))
+
+Matchup Reliability Heuristic =
+IF(
+    ISBLANK([Matchup Legal Balls]),
+    BLANK(),
+    DIVIDE([Matchup Legal Balls], [Matchup Legal Balls] + 30, BLANK())
+)
+
+Situation Legal Balls =
+SUM(v_bowler_situation_performance[balls])
+
+Situation Runs Conceded =
+SUM(v_bowler_situation_performance[runs_conceded])
+
+Situation Credited Wickets =
+SUM(v_bowler_situation_performance[wickets])
+
+Situation Economy =
+DIVIDE([Situation Runs Conceded] * 6, [Situation Legal Balls], BLANK())
+
+Situation Dot Ball Percentage =
 DIVIDE(
-    [Legal Balls],
+    SUM(v_bowler_situation_performance[dot_balls]) * 100,
+    [Situation Legal Balls],
+    BLANK()
+)
+
+Batter Runs =
+SUM(v_batter_career_performance[runs_scored])
+
+Batter Balls Faced =
+SUM(v_batter_career_performance[balls_faced])
+
+Batter Strike Rate =
+DIVIDE([Batter Runs] * 100, [Batter Balls Faced], BLANK())
+
+Batter Dismissals =
+SUM(v_batter_career_performance[dismissals])
+
+Batter Average =
+DIVIDE([Batter Runs], [Batter Dismissals], BLANK())
+
+Season Credited Wickets =
+SUM(v_season_bowling_performance[season_wickets])
+
+Dismissal Events =
+COUNTROWS(fact_wicket)
+
+Bowled or LBW Share of Credited Wickets =
+DIVIDE(
+    CALCULATE(
+        COUNTROWS(fact_wicket),
+        fact_wicket[is_bowler_credited] = TRUE(),
+        fact_wicket[kind] IN {"bowled", "lbw"}
+    ),
     [Credited Wickets],
     BLANK()
-)
-
-Dot Ball Percentage =
-DIVIDE(
-    [Dot Balls],
-    [Legal Balls],
-    BLANK()
 ) * 100
-
-Boundary Percentage =
-DIVIDE(
-    [Boundaries Conceded],
-    [Legal Balls],
-    BLANK()
-) * 100
-
-// 5. Matchup Weight
-Matchup Weight =
-MIN(
-    1.0,
-    DIVIDE([Legal Balls], 30.0, 0)
-)

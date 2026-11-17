@@ -13,6 +13,9 @@ from typing import Any, Callable
 from urllib.parse import parse_qs, urlsplit
 
 from backend.dashboard_data import DashboardData, DashboardDataError, DashboardRequestError
+from backend.database.connection import DatabaseConnection, get_config_from_env
+from backend.database.repository import CricketRepository
+from backend.postgres_dashboard_data import PostgresDashboardData
 from backend.recommendation_engine import (
     DatasetError,
     InvalidRequest,
@@ -40,7 +43,7 @@ class RecommendationHTTPServer(ThreadingHTTPServer):
         self,
         address: tuple[str, int],
         engine: RecommendationEngine,
-        dashboard_data: DashboardData | None = None,
+        dashboard_data: DashboardData | PostgresDashboardData | None = None,
     ):
         self.engine = engine
         self.dashboard_data = dashboard_data
@@ -179,7 +182,9 @@ class RecommendationRequestHandler(BaseHTTPRequestHandler):
 
     @staticmethod
     def _load_dashboard_response(
-        dashboard: DashboardData, request_path: str, values: dict[str, str]
+        dashboard: DashboardData | PostgresDashboardData,
+        request_path: str,
+        values: dict[str, str],
     ) -> dict[str, Any]:
         if request_path == "/api/v1/dashboard/options":
             return dashboard.filter_options()
@@ -194,11 +199,26 @@ class RecommendationRequestHandler(BaseHTTPRequestHandler):
                 values.get("season"),
                 values.get("min_balls"),
             )
+        if request_path == "/api/v1/dashboard/batters":
+            if not isinstance(dashboard, PostgresDashboardData):
+                raise DashboardRequestError(
+                    "Batter career intelligence requires the PostgreSQL analytics view.", 503
+                )
+            return dashboard.batters(values.get("batter_id"), values.get("season"), values.get("search"))
+        if request_path == "/api/v1/dashboard/situations":
+            return dashboard.situations(
+                values.get("bowler_id"),
+                values.get("situation_type"),
+                values.get("situation_value"),
+                values.get("season"),
+                values.get("search"),
+            )
         if request_path == "/api/v1/dashboard/matchups":
             return dashboard.matchups(
                 values.get("bowler_id"),
                 values.get("batter_id"),
                 values.get("phase"),
+                values.get("season"),
                 values.get("min_balls"),
                 values.get("search"),
                 values.get("page"),
@@ -317,16 +337,37 @@ def create_server(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run the local CRIC recommendation API")
+    parser.add_argument(
+        "--source",
+        choices=("postgres", "csv"),
+        default="postgres",
+        help="Analytics source; PostgreSQL is the application default, CSV is an explicit offline mode",
+    )
     parser.add_argument("--data-root", type=Path, default=Path("data"))
     parser.add_argument("--port", type=int, default=8765)
     args = parser.parse_args()
     if not 1 <= args.port <= 65535:
         parser.error("--port must be between 1 and 65535")
-    try:
-        engine = RecommendationEngine.from_data_root(args.data_root)
-    except DatasetError as exc:
-        parser.error(str(exc))
-    server = create_server(engine, port=args.port, data_root=args.data_root)
+    if args.source == "postgres":
+        repository = CricketRepository(DatabaseConnection(get_config_from_env()))
+        if not repository.db.ping():
+            parser.error(
+                "PostgreSQL connection failed. Configure CRIC_DB_* or PG* environment variables; "
+                "the service does not silently fall back to CSV."
+            )
+        try:
+            source_records = RecommendationEngine.load_repository_records(repository)
+            engine = RecommendationEngine(None, records=source_records)
+            dashboard = PostgresDashboardData(repository, engine, source_records)
+        except DatasetError as exc:
+            parser.error(str(exc))
+        server = RecommendationHTTPServer(("127.0.0.1", args.port), engine, dashboard)
+    else:
+        try:
+            engine = RecommendationEngine.from_data_root(args.data_root)
+        except DatasetError as exc:
+            parser.error(str(exc))
+        server = create_server(engine, port=args.port, data_root=args.data_root)
     LOGGER.info("Local recommendation API listening on http://127.0.0.1:%d", args.port)
     try:
         server.serve_forever()

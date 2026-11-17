@@ -1,0 +1,61 @@
+{
+  "name": "CRIC Premium Ivory + Emerald",
+  "dataColors": [
+    "#07543D",
+    "#13835B",
+    "#37A979",
+    "#8EBB78",
+    "#C5A65A",
+    "#66867A",
+    "#A56D57",
+    "#667C92"
+  ],
+  "background": "#F7F4EA",
+  "foreground": "#1D3028",
+  "tableAccent": "#087C59",
+  "good": "#13835B",
+  "neutral": "#C5A65A",
+  "bad": "#A8483D",
+  "maximum": "#07543D",
+  "center": "#E7E2D3",
+  "minimum": "#FFFDF7",
+  "null": "#D6D1C4",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "title": [
+          {
+            "fontFamily": "Segoe UI",
+            "fontSize": 12,
+            "color": {
+              "solid": {
+                "color": "#07543D"
+              }
+            }
+          }
+        ],
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#FFFDF7"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "border": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#E3DFD2"
+              }
+            },
+            "radius": 6
+          }
+        ]
+      }
+    }
+  }
+}

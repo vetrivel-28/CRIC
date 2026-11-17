@@ -7,7 +7,7 @@ import math
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Iterator, Mapping
+from typing import Any, Iterable, Iterator, Mapping
 
 
 class RecommendationError(Exception):
@@ -26,27 +26,37 @@ class DatasetError(RuntimeError):
     pass
 
 
-def normalize_id(value: str) -> str:
-    return value.strip().casefold()
+def normalize_id(value: Any) -> str:
+    if value is None:
+        return ""
+    return str(value).strip().casefold()
 
+def normalize_label(value: Any) -> str:
+    if value is None:
+        return ""
+    return re.sub(r"[^a-z0-9]+", "", str(value).casefold())
 
-def normalize_label(value: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "", value.casefold())
+def normalize_situation_value(value: Any) -> str:
+    if value is None:
+        return ""
+    return re.sub(r"\s+", " ", str(value).casefold().strip())
 
-
-def normalize_situation_value(value: str) -> str:
-    return re.sub(r"\s+", " ", value.casefold().strip())
-
-
-def _number(value: str | None) -> float | None:
-    if value is None or not value.strip():
+def _number(value: Any) -> float | None:
+    if value is None:
         return None
-    try:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
         result = float(value)
-    except ValueError as exc:
-        raise DatasetError(f"Expected a numeric dataset value, got {value!r}") from exc
+    else:
+        text = str(value).strip()
+        if not text:
+            return None
+        try:
+            result = float(text)
+        except ValueError as exc:
+            raise DatasetError(f"Expected a numeric dataset value, got {value!r}") from exc
     return result if math.isfinite(result) else None
-
 
 def _read_rows(path: Path, required: set[str], label: str) -> Iterator[dict[str, str]]:
     try:
@@ -91,7 +101,10 @@ class DatasetPaths:
         }
         found: dict[str, Path] = {}
         for key, filename in filenames.items():
-            matches = sorted(path for path in data_root.rglob(filename) if path.is_file())
+            matches = sorted(
+                path for path in data_root.rglob("*")
+                if path.is_file() and path.name.casefold() == filename.casefold()
+            )
             if len(matches) != 1:
                 raise DatasetError(
                     f"Expected exactly one {filename} beneath {data_root}; found {len(matches)}"
@@ -149,6 +162,10 @@ class Performance:
     name: str
     balls: float
     values: dict[str, float | None]
+    runs_conceded: float | None = None
+    dismissals: float | None = None
+    dot_balls: float | None = None
+    dot_ball_pct: float | None = None
 
 
 @dataclass
@@ -156,6 +173,14 @@ class Evidence:
     balls: float
     values: dict[str, float | None]
     phase_totals: dict[str, tuple[float, float, float]] = field(default_factory=dict)
+    runs_conceded: float | None = None
+    dismissals: float | None = None
+    dot_balls: float | None = None
+    dot_ball_pct: float | None = None
+    phase_dot_balls: dict[str, float] = field(default_factory=dict)
+    batter_balls: float | None = None
+    batter_runs: float | None = None
+    phase_batter_totals: dict[str, tuple[float, float]] = field(default_factory=dict)
 
 
 class RecommendationEngine:
@@ -166,7 +191,12 @@ class RecommendationEngine:
         "wicket_rate": "higher",
     }
 
-    def __init__(self, paths: DatasetPaths, config: RecommendationConfig | None = None):
+    def __init__(
+        self,
+        paths: DatasetPaths | None,
+        config: RecommendationConfig | None = None,
+        records: Mapping[str, Iterable[Mapping[str, Any]]] | None = None,
+    ):
         self.paths = paths
         self.config = config or RecommendationConfig()
         self.players: dict[str, str] = {}
@@ -174,7 +204,12 @@ class RecommendationEngine:
         self.phase: dict[tuple[str, str], Performance] = {}
         self.matchups: dict[tuple[str, str], Evidence] = {}
         self.situations: dict[tuple[str, str, str], Evidence] = {}
-        self._load()
+        if records is None:
+            if paths is None:
+                raise DatasetError("Dataset paths or in-memory analytics records are required")
+            self._load()
+        else:
+            self._load_records(records)
         self.known_bowlers = set(self.career) | {key[0] for key in self.phase}
         self.known_bowlers |= {key[0] for key in self.matchups} | {key[0] for key in self.situations}
 
@@ -183,6 +218,23 @@ class RecommendationEngine:
         cls, data_root: Path, config: RecommendationConfig | None = None
     ) -> "RecommendationEngine":
         return cls(DatasetPaths.discover(data_root), config)
+
+    @classmethod
+    def from_repository(
+        cls, repository: Any, config: RecommendationConfig | None = None
+    ) -> "RecommendationEngine":
+        return cls(None, config, cls.load_repository_records(repository))
+
+    @staticmethod
+    def load_repository_records(repository: Any) -> dict[str, Iterable[Mapping[str, Any]]]:
+        records = {
+            "players": repository.get_players(),
+            "career": repository.get_bowler_career_performance(),
+            "phase": repository.get_bowler_phase_performance(),
+            "matchup": repository.get_bowler_batter_matchups(),
+            "situation": repository.get_bowler_situation_performance(),
+        }
+        return records
 
     @property
     def ready(self) -> bool:
@@ -198,8 +250,73 @@ class RecommendationEngine:
             "wicket_rate": _number(row.get("wicket_rate_per_100_legal_balls")),
         }
 
+    @staticmethod
+    def _dot_ball_pct(balls: float, dot_balls: float | None, recorded_pct: float | None) -> float | None:
+        if balls <= 0:
+            return None
+        if recorded_pct is not None:
+            return recorded_pct
+        if dot_balls is not None:
+            return dot_balls * 100 / balls
+        return None
+
     def _load(self) -> None:
-        for row in _read_rows(self.paths.players, {"player_id", "player_name"}, "players"):
+        assert self.paths is not None
+        self._load_records({
+            "players": _read_rows(self.paths.players, {"player_id", "player_name"}, "players"),
+            "career": _read_rows(
+                self.paths.career,
+                {
+                    "bowler_id", "bowler_name", "legal_balls", "economy",
+                    "bowling_strike_rate_balls_per_wicket",
+                    "wicket_rate_per_100_legal_balls",
+                },
+                "career",
+            ),
+            "phase": _read_rows(
+                self.paths.phase,
+                {
+                    "bowler_id", "bowler_name", "match_phase", "legal_balls",
+                    "economy", "bowling_strike_rate_balls_per_wicket",
+                    "wicket_rate_per_100_legal_balls",
+                },
+                "phase",
+            ),
+            "matchup": _read_rows(
+                self.paths.matchup,
+                {"bowler_id", "batter_id", "balls", "runs_conceded_by_bowler", "wickets"},
+                "matchup",
+            ),
+            "situation": _read_rows(
+                self.paths.situation,
+                {
+                    "bowler_id", "situation_type", "situation_value", "balls",
+                    "runs_conceded", "wickets",
+                },
+                "situation",
+            ),
+        })
+
+    @staticmethod
+    def _records(
+        records: Iterable[Mapping[str, Any]], required: set[str], label: str
+    ) -> Iterator[dict[str, str]]:
+        found = False
+        for raw in records:
+            found = True
+            row = {
+                str(key).strip().casefold(): "" if value is None else str(value).strip()
+                for key, value in raw.items()
+            }
+            missing = required - row.keys()
+            if missing:
+                raise DatasetError(f"{label} is missing required columns: {', '.join(sorted(missing))}")
+            yield row
+        if not found:
+            raise DatasetError(f"Dataset is empty: {label}")
+
+    def _load_records(self, records: Mapping[str, Iterable[Mapping[str, Any]]]) -> None:
+        for row in self._records(records["players"], {"player_id", "player_name"}, "players"):
             player_id = normalize_id(row["player_id"])
             player_name = row["player_name"].strip()
             if not player_id or not player_name:
@@ -209,25 +326,27 @@ class RecommendationEngine:
             self.players[player_id] = player_name
 
         career_columns = {
-            "bowler_id",
-            "bowler_name",
-            "legal_balls",
-            "economy",
+            "bowler_id", "bowler_name", "legal_balls", "economy",
             "bowling_strike_rate_balls_per_wicket",
             "wicket_rate_per_100_legal_balls",
         }
-        for row in _read_rows(
-            self.paths.career,
-            career_columns,
-            "career",
-        ):
+        for row in self._records(records["career"], career_columns, "career"):
             bowler_id = normalize_id(row["bowler_id"])
             if not bowler_id or bowler_id in self.career:
                 raise DatasetError("Career dataset has a blank or duplicate bowler ID")
             balls = _number(row["legal_balls"])
             if balls is None or balls < 0:
                 raise DatasetError("Career dataset has invalid legal-ball sample size")
-            self.career[bowler_id] = Performance(row["bowler_name"], balls, self._metric_values(row, balls))
+            dot_balls = _number(row.get("dot_balls"))
+            self.career[bowler_id] = Performance(
+                row["bowler_name"],
+                balls,
+                self._metric_values(row, balls),
+                _number(row.get("runs_conceded")),
+                _number(row.get("wickets")),
+                dot_balls,
+                self._dot_ball_pct(balls, dot_balls, _number(row.get("dot_ball_pct"))),
+            )
 
         phase_columns = {
             "bowler_id",
@@ -239,7 +358,7 @@ class RecommendationEngine:
             "wicket_rate_per_100_legal_balls",
         }
         phase_labels: dict[str, str] = {}
-        for row in _read_rows(self.paths.phase, phase_columns, "phase"):
+        for row in self._records(records["phase"], phase_columns, "phase"):
             bowler_id = normalize_id(row["bowler_id"])
             phase_key = normalize_label(row["match_phase"])
             balls = _number(row["legal_balls"])
@@ -248,12 +367,21 @@ class RecommendationEngine:
             key = (bowler_id, phase_key)
             if key in self.phase:
                 raise DatasetError("Phase dataset has a duplicate bowler/phase record")
-            self.phase[key] = Performance(row["bowler_name"], balls, self._metric_values(row, balls))
+            dot_balls = _number(row.get("dot_balls"))
+            self.phase[key] = Performance(
+                row["bowler_name"],
+                balls,
+                self._metric_values(row, balls),
+                _number(row.get("runs_conceded")),
+                _number(row.get("wickets")),
+                dot_balls,
+                self._dot_ball_pct(balls, dot_balls, _number(row.get("dot_ball_pct"))),
+            )
             phase_labels.setdefault(phase_key, row["match_phase"])
         self.phase_labels = phase_labels
 
         matchup_columns = {"bowler_id", "batter_id", "balls", "runs_conceded_by_bowler", "wickets"}
-        for row in _read_rows(self.paths.matchup, matchup_columns, "matchup"):
+        for row in self._records(records["matchup"], matchup_columns, "matchup"):
             bowler_id, batter_id = normalize_id(row["bowler_id"]), normalize_id(row["batter_id"])
             balls = _number(row["balls"])
             runs = _number(row["runs_conceded_by_bowler"])
@@ -264,18 +392,39 @@ class RecommendationEngine:
             if key in self.matchups:
                 raise DatasetError("Matchup dataset has a duplicate bowler/batter record")
             phase_totals: dict[str, tuple[float, float, float]] = {}
+            phase_dot_balls: dict[str, float] = {}
+            phase_batter_totals: dict[str, tuple[float, float]] = {}
             for phase_key in self.phase_labels:
                 phase_balls = _number(row.get(f"phase_balls_{phase_key}"))
                 phase_runs = _number(row.get(f"phase_runs_conceded_{phase_key}"))
                 phase_wickets = _number(row.get(f"phase_wickets_{phase_key}"))
                 if phase_balls is not None and phase_runs is not None and phase_wickets is not None:
                     phase_totals[phase_key] = (phase_balls, phase_runs, phase_wickets)
-            self.matchups[key] = Evidence(balls, self._derived_values(balls, runs, wickets), phase_totals)
+                phase_batter_runs = _number(row.get(f"phase_runs_scored_{phase_key}"))
+                if phase_balls is not None and phase_batter_runs is not None:
+                    phase_batter_totals[phase_key] = (phase_balls, phase_batter_runs)
+                phase_dots = _number(row.get(f"phase_dots_{phase_key}"))
+                if phase_dots is not None:
+                    phase_dot_balls[phase_key] = phase_dots
+            dot_balls = _number(row.get("dot_balls"))
+            self.matchups[key] = Evidence(
+                balls,
+                self._derived_values(balls, runs, wickets),
+                phase_totals,
+                runs,
+                wickets,
+                dot_balls,
+                self._dot_ball_pct(balls, dot_balls, _number(row.get("dot_ball_pct"))),
+                phase_dot_balls,
+                balls,
+                _number(row.get("runs_scored_by_batter")),
+                phase_batter_totals,
+            )
 
         situation_columns = {
             "bowler_id", "situation_type", "situation_value", "balls", "runs_conceded", "wickets"
         }
-        for row in _read_rows(self.paths.situation, situation_columns, "situation"):
+        for row in self._records(records["situation"], situation_columns, "situation"):
             bowler_id = normalize_id(row["bowler_id"])
             situation_type = normalize_label(row["situation_type"])
             situation_value = normalize_situation_value(row["situation_value"])
@@ -286,7 +435,17 @@ class RecommendationEngine:
             key = (bowler_id, situation_type, situation_value)
             if key in self.situations:
                 raise DatasetError("Situation dataset has a duplicate bowler/situation record")
-            self.situations[key] = Evidence(balls, self._derived_values(balls, runs, wickets))
+            dot_balls = _number(row.get("dot_balls"))
+            self.situations[key] = Evidence(
+                balls,
+                self._derived_values(balls, runs, wickets),
+                runs_conceded=runs,
+                dismissals=wickets,
+                dot_balls=dot_balls,
+                dot_ball_pct=self._dot_ball_pct(
+                    balls, dot_balls, _number(row.get("dot_ball_pct"))
+                ),
+            )
 
     @staticmethod
     def _derived_values(balls: float, runs: float, wickets: float) -> dict[str, float | None]:
@@ -352,7 +511,15 @@ class RecommendationEngine:
                     matchup = None
                 else:
                     balls, runs, wickets = phase_totals
-                    matchup = Evidence(balls, self._derived_values(balls, runs, wickets))
+                    dots = matchup.phase_dot_balls.get(phase_key)
+                    matchup = Evidence(
+                        balls,
+                        self._derived_values(balls, runs, wickets),
+                        runs_conceded=runs,
+                        dismissals=wickets,
+                        dot_balls=dots,
+                        dot_ball_pct=self._dot_ball_pct(balls, dots, None),
+                    )
 
         situation = None
         if situation_key is not None:
@@ -530,6 +697,10 @@ class RecommendationEngine:
                         "wicket_rate_per_100_legal_balls": evidence.values.get("wicket_rate"),
                         "sample_balls": evidence.balls,
                         "sample_assessment": self._sample_assessment(evidence.balls),
+                        "runs_conceded": evidence.runs_conceded,
+                        "dismissals": evidence.dismissals,
+                        "dot_balls": evidence.dot_balls,
+                        "dot_ball_pct": evidence.dot_ball_pct,
                     }
 
             warnings: list[str] = []
@@ -560,9 +731,25 @@ class RecommendationEngine:
                 warnings.append("No usable historical metric evidence; score is unavailable.")
             evidence_text = []
             for source in component_scores:
+                evidence = features[source]
+                metric_labels = {
+                    "economy": "economy (runs per six legal balls)",
+                    "strike_rate": "bowling strike rate (legal balls per credited wicket)",
+                    "wicket_rate": "credited-wicket rate per 100 legal balls",
+                }
+                metric_details = [
+                    f"{metric_labels[metric]} {evidence.values[metric]:.2f}"
+                    for metric in self.config.metric_weights[source]
+                    if evidence.values.get(metric) is not None
+                ]
+                detail_text = (
+                    f" using {', '.join(metric_details)} over {evidence.balls:g} legal balls"
+                    if metric_details
+                    else ""
+                )
                 evidence_text.append(
                     f"{source.capitalize()} component score: {component_scores[source] * 100:.1f}/100 "
-                    f"after metric sample adjustment; effective weight "
+                    f"after metric sample adjustment{detail_text}; effective weight "
                     f"{normalized_sources[source] * 100:.1f}% of this candidate's overall score."
                 )
             reliability_values = list(reliability[bowler_id].values())

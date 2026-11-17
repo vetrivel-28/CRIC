@@ -1,0 +1,11 @@
+check,value,interpretation
+source_delivery_rows,966985,Loaded from original deliveries.csv
+output_rows,7976,Bowler-phase aggregates
+duplicate_bowler_phase_keys,0,Expected zero
+missing_bowler_ids,0,Expected zero
+source_rows_missing_phase,0,Excluded from phase aggregates; retained in report
+credited_wickets_in_output,48983,Phase-matched credited wicket events
+credited_events_without_phase_match,0,Requires review in final audit
+negative_runs_conceded_rows,0,Expected zero
+zero_legal_ball_rows,1,Rates remain undefined
+rate_formula_mismatches,0,Expected zero

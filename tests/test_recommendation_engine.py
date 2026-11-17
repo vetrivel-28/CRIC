@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from backend.dashboard_data import DashboardData
 from backend.recommendation_engine import (
     DatasetPaths,
     DatasetError,
@@ -13,6 +14,10 @@ from backend.recommendation_engine import (
     RecommendationConfig,
     RecommendationEngine,
     UnknownIdentifier,
+    _number,
+    normalize_id,
+    normalize_label,
+    normalize_situation_value,
 )
 
 
@@ -46,46 +51,55 @@ def fixture_paths(tmp_path: Path) -> DatasetPaths:
         "economy",
         "bowling_strike_rate_balls_per_wicket",
         "wicket_rate_per_100_legal_balls",
+        "runs_conceded",
+        "wickets",
+        "dot_balls",
+        "dot_ball_pct",
     ]
     career = _write_csv(
         tmp_path / "career.csv",
         metric_headers,
         [
-            {"bowler_id": "A001", "bowler_name": "Bowler A", "legal_balls": 600, "economy": 4, "bowling_strike_rate_balls_per_wicket": 15, "wicket_rate_per_100_legal_balls": 6.67},
-            {"bowler_id": "B001", "bowler_name": "Bowler B", "legal_balls": 300, "economy": 6, "bowling_strike_rate_balls_per_wicket": 20, "wicket_rate_per_100_legal_balls": 5},
-            {"bowler_id": "C001", "bowler_name": "Bowler C", "legal_balls": 120, "economy": 8, "bowling_strike_rate_balls_per_wicket": 30, "wicket_rate_per_100_legal_balls": 3.33},
-            {"bowler_id": "D001", "bowler_name": "Wide Only", "legal_balls": 0, "economy": 0, "bowling_strike_rate_balls_per_wicket": 0, "wicket_rate_per_100_legal_balls": 0},
+            {"bowler_id": "A001", "bowler_name": "Bowler A", "legal_balls": 600, "economy": 4, "bowling_strike_rate_balls_per_wicket": 15, "wicket_rate_per_100_legal_balls": 6.67, "runs_conceded": 400, "wickets": 40, "dot_balls": 240, "dot_ball_pct": 40},
+            {"bowler_id": "B001", "bowler_name": "Bowler B", "legal_balls": 300, "economy": 6, "bowling_strike_rate_balls_per_wicket": 20, "wicket_rate_per_100_legal_balls": 5, "runs_conceded": 300, "wickets": 15, "dot_balls": 90, "dot_ball_pct": 30},
+            {"bowler_id": "C001", "bowler_name": "Bowler C", "legal_balls": 120, "economy": 8, "bowling_strike_rate_balls_per_wicket": 30, "wicket_rate_per_100_legal_balls": 3.33, "runs_conceded": 160, "wickets": 4, "dot_balls": 24, "dot_ball_pct": 20},
+            {"bowler_id": "D001", "bowler_name": "Wide Only", "legal_balls": 0, "economy": 0, "bowling_strike_rate_balls_per_wicket": 0, "wicket_rate_per_100_legal_balls": 0, "runs_conceded": 0, "wickets": 0, "dot_balls": 0, "dot_ball_pct": 0},
         ],
     )
     phase = _write_csv(
         tmp_path / "phase.csv",
         ["bowler_id", "bowler_name", "match_phase", *metric_headers[2:]],
         [
-            {"bowler_id": "A001", "bowler_name": "Bowler A", "match_phase": "Death", "legal_balls": 60, "economy": 5, "bowling_strike_rate_balls_per_wicket": 12, "wicket_rate_per_100_legal_balls": 8.33},
-            {"bowler_id": "B001", "bowler_name": "Bowler B", "match_phase": "Death", "legal_balls": 30, "economy": 7, "bowling_strike_rate_balls_per_wicket": 30, "wicket_rate_per_100_legal_balls": 3.33},
-            {"bowler_id": "C001", "bowler_name": "Bowler C", "match_phase": "Death", "legal_balls": 24, "economy": 9, "bowling_strike_rate_balls_per_wicket": "", "wicket_rate_per_100_legal_balls": 0},
-            {"bowler_id": "D001", "bowler_name": "Wide Only", "match_phase": "Death", "legal_balls": 0, "economy": 0, "bowling_strike_rate_balls_per_wicket": 0, "wicket_rate_per_100_legal_balls": 0},
+            {"bowler_id": "A001", "bowler_name": "Bowler A", "match_phase": "Death", "legal_balls": 60, "economy": 5, "bowling_strike_rate_balls_per_wicket": 12, "wicket_rate_per_100_legal_balls": 8.33, "runs_conceded": 50, "wickets": 5, "dot_balls": 30, "dot_ball_pct": 50},
+            {"bowler_id": "B001", "bowler_name": "Bowler B", "match_phase": "Death", "legal_balls": 30, "economy": 7, "bowling_strike_rate_balls_per_wicket": 30, "wicket_rate_per_100_legal_balls": 3.33, "runs_conceded": 35, "wickets": 1, "dot_balls": 9, "dot_ball_pct": 30},
+            {"bowler_id": "C001", "bowler_name": "Bowler C", "match_phase": "Death", "legal_balls": 24, "economy": 9, "bowling_strike_rate_balls_per_wicket": "", "wicket_rate_per_100_legal_balls": 0, "runs_conceded": 36, "wickets": 0, "dot_balls": 6, "dot_ball_pct": 25},
+            {"bowler_id": "D001", "bowler_name": "Wide Only", "match_phase": "Death", "legal_balls": 0, "economy": 0, "bowling_strike_rate_balls_per_wicket": 0, "wicket_rate_per_100_legal_balls": 0, "runs_conceded": 0, "wickets": 0, "dot_balls": 0, "dot_ball_pct": 0},
         ],
     )
     matchup = _write_csv(
         tmp_path / "matchup.csv",
         [
-            "bowler_id", "batter_id", "balls", "runs_conceded_by_bowler", "wickets",
-            "phase_balls_death", "phase_runs_conceded_death", "phase_wickets_death",
+            "bowler_id", "batter_id", "balls", "runs_scored_by_batter",
+            "runs_conceded_by_bowler", "wickets",
+            "dot_balls", "dot_ball_pct", "phase_balls_death", "phase_runs_conceded_death",
+            "phase_runs_scored_death", "phase_wickets_death", "phase_dots_death",
         ],
         [
-            {"bowler_id": "A001", "batter_id": "BAT1", "balls": 10, "runs_conceded_by_bowler": 8, "wickets": 1, "phase_balls_death": 10, "phase_runs_conceded_death": 8, "phase_wickets_death": 1},
-            {"bowler_id": "B001", "batter_id": "BAT1", "balls": 60, "runs_conceded_by_bowler": 70, "wickets": 2, "phase_balls_death": 30, "phase_runs_conceded_death": 40, "phase_wickets_death": 1},
-            {"bowler_id": "D001", "batter_id": "BAT1", "balls": 0, "runs_conceded_by_bowler": 0, "wickets": 0, "phase_balls_death": 0, "phase_runs_conceded_death": 0, "phase_wickets_death": 0},
+            {"bowler_id": "A001", "batter_id": "BAT1", "balls": 10, "runs_scored_by_batter": 9, "runs_conceded_by_bowler": 8, "wickets": 1, "dot_balls": 5, "dot_ball_pct": 50, "phase_balls_death": 10, "phase_runs_conceded_death": 8, "phase_runs_scored_death": 7, "phase_wickets_death": 1, "phase_dots_death": 5},
+            {"bowler_id": "B001", "batter_id": "BAT1", "balls": 60, "runs_scored_by_batter": 55, "runs_conceded_by_bowler": 70, "wickets": 2, "dot_balls": 30, "dot_ball_pct": 50, "phase_balls_death": 30, "phase_runs_conceded_death": 40, "phase_runs_scored_death": 35, "phase_wickets_death": 1, "phase_dots_death": 15},
+            {"bowler_id": "D001", "batter_id": "BAT1", "balls": 0, "runs_scored_by_batter": 0, "runs_conceded_by_bowler": 0, "wickets": 0, "dot_balls": 0, "dot_ball_pct": "", "phase_balls_death": 0, "phase_runs_conceded_death": 0, "phase_runs_scored_death": 0, "phase_wickets_death": 0, "phase_dots_death": 0},
         ],
     )
     situation = _write_csv(
         tmp_path / "situation.csv",
-        ["bowler_id", "situation_type", "situation_value", "balls", "runs_conceded", "wickets"],
         [
-            {"bowler_id": "A001", "situation_type": "phase", "situation_value": "Death", "balls": 60, "runs_conceded": 50, "wickets": 6},
-            {"bowler_id": "B001", "situation_type": "phase", "situation_value": "Death", "balls": 30, "runs_conceded": 45, "wickets": 1},
-            {"bowler_id": "D001", "situation_type": "phase", "situation_value": "Death", "balls": 0, "runs_conceded": 0, "wickets": 1},
+            "bowler_id", "situation_type", "situation_value", "balls", "runs_conceded",
+            "wickets", "dot_balls", "dot_ball_pct",
+        ],
+        [
+            {"bowler_id": "A001", "situation_type": "phase", "situation_value": "Death", "balls": 60, "runs_conceded": 50, "wickets": 6, "dot_balls": 30, "dot_ball_pct": 50},
+            {"bowler_id": "B001", "situation_type": "phase", "situation_value": "Death", "balls": 30, "runs_conceded": 45, "wickets": 1, "dot_balls": 9, "dot_ball_pct": 30},
+            {"bowler_id": "D001", "situation_type": "phase", "situation_value": "Death", "balls": 0, "runs_conceded": 0, "wickets": 1, "dot_balls": 0, "dot_ball_pct": ""},
         ],
     )
     return DatasetPaths(players, career, phase, matchup, situation)
@@ -130,7 +144,17 @@ def test_phase_matchup_and_situation_evidence_are_used(engine):
     assert first["data_availability"]["performance"] == "phase"
     assert first["metrics"]["matchup"]["sample_balls"] == 10
     assert first["metrics"]["matchup"]["sample_assessment"] == "very_small_sample"
+    assert first["metrics"]["matchup"]["runs_conceded"] == 8
+    assert first["metrics"]["matchup"]["dismissals"] == 1
+    assert first["metrics"]["matchup"]["dot_balls"] == 5
+    assert first["metrics"]["matchup"]["dot_ball_pct"] == 50
     assert first["metrics"]["situation"]["sample_balls"] == 60
+    assert first["metrics"]["situation"]["runs_conceded"] == 50
+    assert first["metrics"]["situation"]["dismissals"] == 6
+    assert first["metrics"]["situation"]["dot_ball_pct"] == 50
+    assert first["metrics"]["performance"]["runs_conceded"] == 50
+    assert first["metrics"]["performance"]["dismissals"] == 5
+    assert first["metrics"]["performance"]["dot_ball_pct"] == 50
     assert "matchup" in first["score_components"]
     assert "situation" in first["score_components"]
     for recommendation in response["recommendations"]:
@@ -144,12 +168,27 @@ def test_phase_matchup_and_situation_evidence_are_used(engine):
         assert len(recommendation["evidence"]) == len(components)
         for source, component_score in components.items():
             effective_weight = engine.config.component_weights[source] / total_weight * 100
-            assert (
-                f"{source.capitalize()} component score: {component_score:.1f}/100 "
-                f"after metric sample adjustment; effective weight {effective_weight:.1f}% "
-                "of this candidate's overall score."
-                in recommendation["evidence"]
-            )
+            matching_explanations = [
+                line for line in recommendation["evidence"]
+                if line.startswith(f"{source.capitalize()} component score: {component_score:.1f}/100")
+            ]
+            assert len(matching_explanations) == 1
+            assert "after metric sample adjustment" in matching_explanations[0]
+            assert f"effective weight {effective_weight:.1f}%" in matching_explanations[0]
+            assert " legal balls" in matching_explanations[0]
+
+
+def test_matchup_dashboard_reuses_batter_metrics_from_engine_evidence(engine):
+    evidence = engine.matchups[("a001", "bat1")]
+    assert evidence.batter_balls == 10
+    assert evidence.batter_runs == 9
+    assert evidence.phase_batter_totals["death"] == (10, 7)
+
+    dashboard = DashboardData.__new__(DashboardData)
+    dashboard.engine = engine
+    row = dashboard._matchup_row("a001", "bat1", "death")
+    assert row["batter_runs"] == 7
+    assert row["batter_strike_rate"] == 70
 
 
 def test_known_batter_without_matchup_gets_explicit_missing_evidence(engine):
@@ -226,11 +265,11 @@ def test_candidate_set_and_exclusion_recalibrate_relative_scores(fixture_paths):
     assert b_with_a["score"] == pytest.approx(4.55)
     assert b_with_a["score_scale"] == "0_to_100_candidate_relative"
     assert b_with_a["score_components"]["performance"] == pytest.approx(b_with_a["score"])
-    assert (
-        "Performance component score: 4.5/100 after metric sample adjustment; "
-        "effective weight 100.0% of this candidate's overall score."
-        in b_with_a["evidence"]
-    )
+    explanation = b_with_a["evidence"][0]
+    assert explanation.startswith("Performance component score: 4.5/100")
+    assert "using economy (runs per six legal balls) 6.00" in explanation
+    assert "over 300 legal balls" in explanation
+    assert "effective weight 100.0%" in explanation
 
     with_a_excluded = recommender.recommend(
         _request(
@@ -324,6 +363,7 @@ def test_zero_legal_ball_and_null_rate_remain_unavailable(engine):
     assert recommendation["metrics"]["performance"]["economy"] is None
     assert recommendation["metrics"]["performance"]["bowling_strike_rate_balls_per_wicket"] is None
     assert recommendation["metrics"]["performance"]["wicket_rate_per_100_legal_balls"] is None
+    assert recommendation["metrics"]["performance"]["dot_ball_pct"] is None
     assert recommendation["metrics"]["performance"]["sample_assessment"] == "no_legal_balls"
     assert recommendation["score"] is None
     assert any("score is unavailable" in warning for warning in recommendation["warnings"])
@@ -467,6 +507,15 @@ def test_configurable_weights_are_validated():
         RecommendationConfig(
             component_weights={"performance": 0.0, "matchup": 0.0, "situation": 0.0}
         )
+
+
+def test_string_and_numeric_inputs_are_normalized_consistently():
+    assert normalize_id(123) == "123"
+    assert normalize_label(123) == "123"
+    assert normalize_situation_value("  Death   Overs ") == "death overs"
+    assert _number(42) == pytest.approx(42.0)
+    assert _number("  7.5 ") == pytest.approx(7.5)
+    assert _number(None) is None
 
 
 def test_duplicate_player_identifier_is_rejected(fixture_paths):

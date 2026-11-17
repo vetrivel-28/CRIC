@@ -84,6 +84,78 @@ def test_health_and_recommendation_endpoint_are_local(running_api):
     assert len({row["bowler_id"] for row in payload["recommendations"]}) == len(payload["recommendations"])
 
 
+def test_real_recommendations_expose_source_verified_matchup_phase_and_situation(running_api):
+    base_url, engine = running_api
+    phase_key = "death"
+    phase_label = engine.phase_labels[phase_key]
+    situation_value = phase_label.casefold()
+    groups = {}
+    for (bowler_id, batter_id), evidence in engine.matchups.items():
+        phase_totals = evidence.phase_totals.get(phase_key)
+        situation = engine.situations.get((bowler_id, "phase", situation_value))
+        if phase_totals and phase_totals[0] > 0 and situation and situation.balls > 0:
+            groups.setdefault(batter_id, []).append((bowler_id, phase_totals[0]))
+    batter_id, candidates = max(
+        groups.items(),
+        key=lambda item: (len(item[1]), item[0]),
+    )
+    candidates.sort(key=lambda item: (-item[1], item[0]))
+    candidate_ids = [bowler_id for bowler_id, _ in candidates[:3]]
+
+    status, payload = _post(
+        f"{base_url}/api/v1/recommendations",
+        json.dumps(
+            {
+                "batter_id": batter_id,
+                "phase": phase_label,
+                "situation": {"type": "phase", "value": phase_label},
+                "candidates": [{"bowler_id": bowler_id} for bowler_id in candidate_ids],
+            }
+        ).encode(),
+    )
+    assert status == 200
+    assert [item["rank"] for item in payload["recommendations"]] == [1, 2, 3]
+    assert all(0 <= item["sample_reliability"] <= 1 for item in payload["recommendations"])
+
+    selected_bowler_id = payload["recommendations"][0]["bowler_id"]
+    with engine.paths.matchup.open("r", encoding="utf-8-sig", newline="") as source:
+        matchup_row = next(
+            row for row in csv.DictReader(source)
+            if row["bowler_id"].casefold() == selected_bowler_id
+            and row["batter_id"].casefold() == batter_id
+        )
+    with engine.paths.phase.open("r", encoding="utf-8-sig", newline="") as source:
+        phase_row = next(
+            row for row in csv.DictReader(source)
+            if row["bowler_id"].casefold() == selected_bowler_id
+            and row["match_phase"].casefold() == phase_label.casefold()
+        )
+    with engine.paths.situation.open("r", encoding="utf-8-sig", newline="") as source:
+        situation_row = next(
+            row for row in csv.DictReader(source)
+            if row["bowler_id"].casefold() == selected_bowler_id
+            and row["situation_type"].casefold() == "phase"
+            and row["situation_value"].casefold() == situation_value
+        )
+
+    recommendation = payload["recommendations"][0]
+    matchup_metrics = recommendation["metrics"]["matchup"]
+    matchup_balls = float(matchup_row["phase_balls_death"])
+    matchup_dots = float(matchup_row["phase_dots_death"])
+    assert matchup_metrics["sample_balls"] == matchup_balls
+    assert matchup_metrics["runs_conceded"] == float(matchup_row["phase_runs_conceded_death"])
+    assert matchup_metrics["dismissals"] == float(matchup_row["phase_wickets_death"])
+    assert matchup_metrics["dot_balls"] == matchup_dots
+    assert matchup_metrics["dot_ball_pct"] == pytest.approx(matchup_dots * 100 / matchup_balls)
+    for source_name, source_row in (("performance", phase_row), ("situation", situation_row)):
+        metrics = recommendation["metrics"][source_name]
+        assert metrics["runs_conceded"] == float(source_row["runs_conceded"])
+        assert metrics["dismissals"] == float(source_row["wickets"])
+        assert metrics["dot_balls"] == float(source_row["dot_balls"])
+        assert metrics["dot_ball_pct"] == float(source_row["dot_ball_pct"])
+    assert any("over" in line and "legal balls" in line for line in recommendation["evidence"])
+
+
 def test_options_and_static_frontend_are_served_without_file_access(running_api):
     base_url, engine = running_api
     with urllib.request.urlopen(f"{base_url}/api/v1/options", timeout=10) as response:
@@ -183,6 +255,16 @@ def test_dashboard_routes_use_real_local_data_and_validate_filters(running_api):
     status, error = _get(f"{base_url}/api/v1/dashboard/overview?phase=not-a-phase")
     assert status == 400
     assert error["error"]["code"] == "invalid_request"
+
+    status, situations = _get(
+        f"{base_url}/api/v1/dashboard/situations?situation_type=phase&situation_value=death"
+    )
+    assert status == 200
+    assert situations["total"] > 0
+    assert all(
+        row["situation_type"] == "phase" and row["situation_value"] == "death"
+        for row in situations["rows"]
+    )
 
     status, matchups = _get(
         f"{base_url}/api/v1/dashboard/matchups?page=1&page_size=10&sort=wickets&order=desc"

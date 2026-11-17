@@ -3,7 +3,7 @@
 
   const API = "/api/v1/dashboard";
   const PAGE_SIZE = 25;
-  const PALETTE = ["#005746", "#00A16A", "#0F8888", "#6F838B", "#7FEA00"];
+  const PALETTE = ["#07543D", "#13835B", "#087C59", "#64746D", "#B7D77A"];
   const charts = new Map();
   const state = {
     options: null,
@@ -23,7 +23,7 @@
     activeTab: "bowler-analytics",
     phaseRows: [],
     phaseSort: { column: "wickets", order: "desc" },
-    requestVersions: { overview: 0, bowler: 0, matchup: 0, wicket: 0, phase: 0, dataset: 0, catalog: 0 },
+    requestVersions: { overview: 0, bowler: 0, batter: 0, situation: 0, matchup: 0, wicket: 0, phase: 0, dataset: 0, catalog: 0 },
   };
 
   const byId = (id) => document.getElementById(id);
@@ -111,6 +111,28 @@
     if ([...select.options].some((option) => option.value === selected)) select.value = selected;
   }
 
+  function getSeasonSelection() {
+    const season = (byId("global-season")?.value || byId("global-season-analytics")?.value || "").trim();
+    return season;
+  }
+
+  function syncSeasonSelection(value) {
+    for (const id of ["global-season", "global-season-analytics", "wicket-season"]) {
+      const element = byId(id);
+      if (element) element.value = value;
+    }
+  }
+
+  function applyDefaultSeason(options) {
+    const seasonOptions = [...new Set((options.seasons || []).filter(Boolean))];
+    const candidates = ["2022 onwards", "2022+", "2022"];
+    const preferred = candidates.find((candidate) => seasonOptions.includes(candidate))
+      || [...seasonOptions].filter((season) => /^\d{4}$/.test(season) && Number(season) >= 2022).sort((left, right) => Number(right) - Number(left))[0]
+      || "";
+    if (preferred) syncSeasonSelection(preferred);
+    else syncSeasonSelection("");
+  }
+
   function validSeries(series, labelKey, valueKey) {
     return Array.isArray(series) && series.every((item) =>
       item && typeof item[labelKey] === "string" && Number.isFinite(item[valueKey]) && item[valueKey] >= 0
@@ -161,7 +183,7 @@
           maintainAspectRatio: false,
           interaction: { mode: "nearest", intersect: false },
           plugins: {
-            legend: { display: datasets.length > 1, position: "bottom", labels: { usePointStyle: true, color: "#687a8d", font: { size: 10 }, padding: 15 } },
+            legend: { display: datasets.length > 1, position: "bottom", labels: { usePointStyle: true, color: "#596b62", font: { size: 10 }, padding: 15 } },
             tooltip: { enabled: true },
           },
           ...options,
@@ -179,15 +201,15 @@
       scales: {
         x: {
           beginAtZero: true,
-          grid: { display: !horizontal, color: "#edf1f5" },
-          ticks: { color: "#75869a", precision: 0 },
-          title: { display: Boolean(horizontal ? yTitle : xTitle), text: horizontal ? yTitle : xTitle, color: "#718096", font: { size: 10 } },
+          grid: { display: !horizontal, color: "#e9e5d9" },
+          ticks: { color: "#64746d", precision: 0 },
+          title: { display: Boolean(horizontal ? yTitle : xTitle), text: horizontal ? yTitle : xTitle, color: "#596b62", font: { size: 10 } },
         },
         y: {
           beginAtZero: true,
-          grid: { display: horizontal, color: "#edf1f5" },
-          ticks: { color: "#75869a", precision: 0, autoSkip: !horizontal },
-          title: { display: Boolean(horizontal ? xTitle : yTitle), text: horizontal ? xTitle : yTitle, color: "#718096", font: { size: 10 } },
+          grid: { display: horizontal, color: "#e9e5d9" },
+          ticks: { color: "#64746d", precision: 0, autoSkip: !horizontal },
+          title: { display: Boolean(horizontal ? xTitle : yTitle), text: horizontal ? xTitle : yTitle, color: "#596b62", font: { size: 10 } },
         },
       },
     };
@@ -265,7 +287,7 @@
     chartEmpty("top-bowlers-chart", "Loading top bowler records…");
     setComponentState("kpi-error", "Loading dataset summary…");
     try {
-      const data = await requestJson("overview", { min_balls: 30 });
+      const data = await requestJson("overview", { min_balls: 30, season: getSeasonSelection() });
       if (requestVersion !== state.requestVersions.overview) return;
       if (!data.kpis || typeof data.kpis !== "object") throw new DashboardError("The overview response is missing dataset totals.");
       state.overview = data;
@@ -319,9 +341,9 @@
       { type: "line", label: "Credited wickets", data: phases.map((item) => item.wickets), borderColor: PALETTE[1], backgroundColor: PALETTE[1], yAxisID: "y1", tension: 0.15, pointRadius: 4 },
     ], {
       scales: {
-        x: { grid: { display: false }, ticks: { color: "#6F838B" } },
-        y: { beginAtZero: true, grid: { color: "#e4ebea" }, title: { display: true, text: "Economy", color: "#6F838B" }, ticks: { color: "#6F838B" } },
-        y1: { beginAtZero: true, position: "right", grid: { drawOnChartArea: false }, title: { display: true, text: "Credited wickets", color: "#6F838B" }, ticks: { color: "#6F838B", precision: 0 } },
+        x: { grid: { display: false }, ticks: { color: "#64746d" } },
+        y: { beginAtZero: true, grid: { color: "#e9e5d9" }, title: { display: true, text: "Economy", color: "#64746d" }, ticks: { color: "#64746d" } },
+        y1: { beginAtZero: true, position: "right", grid: { drawOnChartArea: false }, title: { display: true, text: "Credited wickets", color: "#64746d" }, ticks: { color: "#64746d", precision: 0 } },
       },
       plugins: { tooltip: { callbacks: { label: (context) => ` ${context.dataset.label}: ${context.parsed.y === null ? "n/a" : formatMetric(context.parsed.y)}`, afterBody: (items) => {
         const row = phases[items[0].dataIndex];
@@ -340,8 +362,8 @@
       pointRadius: 3,
     }], {
       scales: {
-        x: { grid: { display: false }, ticks: { color: "#6F838B", maxRotation: 0 }, title: { display: true, text: "Dataset season", color: "#6F838B" } },
-        y: { beginAtZero: true, grid: { color: "#e4ebea" }, ticks: { color: "#6F838B", precision: 0 }, title: { display: true, text: "Wickets", color: "#6F838B" } },
+        x: { grid: { display: false }, ticks: { color: "#64746d", maxRotation: 0 }, title: { display: true, text: "Dataset season", color: "#64746d" } },
+        y: { beginAtZero: true, grid: { color: "#e9e5d9" }, ticks: { color: "#64746d", precision: 0 }, title: { display: true, text: "Wickets", color: "#64746d" } },
       },
     }, "No chronological season records are available for this bowler.");
   }
@@ -352,7 +374,7 @@
     chartEmpty("bowler-season-chart", "Loading bowler season records…");
     setComponentState("bowler-error", "Loading bowler statistics…");
     try {
-      const data = await requestJson("bowler", { bowler_id: byId("bowler-select").value });
+      const data = await requestJson("bowler", { bowler_id: byId("bowler-select").value, season: getSeasonSelection() });
       if (requestVersion !== state.requestVersions.bowler) return;
       renderBowlerSummary(data);
       renderBowlerCharts(data);
@@ -361,6 +383,122 @@
       if (requestVersion !== state.requestVersions.bowler) return;
       setComponentState("bowler-error", error.message || "Bowler analytics could not be loaded.", loadBowler);
       for (const canvas of ["bowler-phase-chart", "bowler-season-chart"]) chartEmpty(canvas, error.message || "Bowler analytics are unavailable.");
+    }
+  }
+
+  async function loadBatters() {
+    const requestVersion = ++state.requestVersions.batter;
+    chartEmpty("batter-runs-chart", "Loading batter career totals…");
+    setComponentState("batter-intelligence-error", "Loading batter intelligence…");
+    try {
+      const data = await requestJson("batters", {
+        batter_id: byId("batter-intelligence-select").value,
+        season: getSeasonSelection(),
+      });
+      if (requestVersion !== state.requestVersions.batter) return;
+      const batter = data.selected_batter;
+      const metrics = {
+        "batter-runs": batter?.runs_scored,
+        "batter-balls": batter?.balls_faced,
+        "batter-strike-rate": batter?.strike_rate,
+        "batter-average": batter?.batting_average,
+        "batter-dismissals": batter?.dismissals,
+      };
+      for (const [id, value] of Object.entries(metrics)) {
+        byId(id).textContent = value === null || value === undefined
+          ? "n/a"
+          : id === "batter-runs" || id === "batter-balls" || id === "batter-dismissals"
+            ? countFormat.format(value)
+            : formatMetric(value);
+      }
+      const leaders = data.leaders || [];
+      drawChart("batter-runs-chart", "bar", leaders.map((item) => item.batter_name), [{
+        label: "Historical runs",
+        data: leaders.map((item) => item.runs_scored),
+        backgroundColor: PALETTE[2],
+        borderRadius: 3,
+        maxBarThickness: 30,
+      }], {
+        ...axisOptions("Batter", "Runs"),
+        plugins: { legend: { display: false }, tooltip: { callbacks: { afterBody: (items) => {
+          const item = leaders[items[0].dataIndex];
+          return [
+            `Balls faced: ${countFormat.format(item.balls_faced)}`,
+            `Strike rate: ${formatMetric(item.strike_rate)}`,
+            `Dismissals: ${countFormat.format(item.dismissals)}`,
+          ];
+        } } } },
+      }, "No batter career records are available.");
+      setComponentState("batter-intelligence-error", "");
+    } catch (error) {
+      if (requestVersion !== state.requestVersions.batter) return;
+      setComponentState("batter-intelligence-error", error.message || "Batter intelligence could not be loaded.", loadBatters);
+      chartEmpty("batter-runs-chart", error.message || "Batter intelligence is unavailable.");
+    }
+  }
+
+  function renderSituationTable(rows) {
+    const body = byId("situation-table").tBodies[0];
+    body.replaceChildren();
+    if (!rows.length) {
+      body.append(tableMessage("No situation records match the selected filters.", 9));
+      return;
+    }
+    for (const item of rows) {
+      const tr = document.createElement("tr");
+      tr.append(
+        tableCell(`${item.bowler_name} · ${item.bowler_id}`),
+        tableCell(`${item.situation_type}: ${item.situation_value}`),
+        tableCell(item.cricket_over === null ? "n/a" : formatMetric(item.cricket_over)),
+        tableCell(countFormat.format(item.balls)),
+        tableCell(formatMetric(item.runs_conceded)),
+        tableCell(item.wickets),
+        metricCell(item.economy, "economy", { legal_balls: item.balls, wickets: item.wickets }),
+        metricCell(item.bowling_strike_rate, "bowling_strike_rate", { legal_balls: item.balls, wickets: item.wickets }),
+        tableCell(item.sample_size_flag || "sample unavailable"),
+      );
+      body.append(tr);
+    }
+  }
+
+  async function loadSituations() {
+    const requestVersion = ++state.requestVersions.situation;
+    chartEmpty("situation-economy-chart", "Loading situation evidence…");
+    setComponentState("situation-error", "Loading situation analytics…");
+    try {
+      const data = await requestJson("situations", {
+        bowler_id: byId("situation-bowler").value,
+        situation_type: byId("dashboard-situation-type").value,
+        situation_value: byId("dashboard-situation-value").value,
+        season: getSeasonSelection(),
+      });
+      if (requestVersion !== state.requestVersions.situation) return;
+      const rows = data.rows || [];
+      renderSituationTable(rows);
+      byId("situation-count").textContent = `${countFormat.format(data.total)} matching situation records · showing up to ${rows.length} records`;
+      const chartRows = rows.filter((item) => item.economy !== null).slice(0, 20);
+      drawChart("situation-economy-chart", "bar", chartRows.map((item) =>
+        `${item.bowler_name} · ${item.situation_value}${item.cricket_over === null ? "" : ` · over ${item.cricket_over}`}`
+      ), [{
+        label: "Economy · runs per 6 legal balls",
+        data: chartRows.map((item) => item.economy),
+        backgroundColor: PALETTE[1],
+        borderRadius: 3,
+        maxBarThickness: 24,
+      }], {
+        ...axisOptions("Bowler and situation", "Economy", true),
+        plugins: { legend: { display: false }, tooltip: { callbacks: { afterBody: (items) => {
+          const item = chartRows[items[0].dataIndex];
+          return `Sample: ${countFormat.format(item.balls)} legal balls · ${item.wickets} credited wickets`;
+        } } } },
+      }, "No situation economy metrics are available for the selected filters.");
+      setComponentState("situation-error", "");
+    } catch (error) {
+      if (requestVersion !== state.requestVersions.situation) return;
+      byId("situation-table").tBodies[0].replaceChildren(tableMessage(error.message || "Situation data is unavailable.", 9));
+      byId("situation-count").textContent = "Situation data unavailable";
+      setComponentState("situation-error", error.message || "Situation data could not be loaded.", loadSituations);
+      chartEmpty("situation-economy-chart", error.message || "Situation data is unavailable.");
     }
   }
 
@@ -419,9 +557,9 @@
       { type: "line", label: "Credited wickets", data: leaders.map((item) => item.wickets), borderColor: PALETTE[1], backgroundColor: PALETTE[1], yAxisID: "y1", pointRadius: 3 },
     ], {
       scales: {
-        x: { grid: { display: false }, ticks: { color: "#6F838B", maxRotation: 0, autoSkip: true } },
-        y: { beginAtZero: true, grid: { color: "#e4ebea" }, ticks: { color: "#6F838B" }, title: { display: true, text: "Batter runs", color: "#6F838B" } },
-        y1: { beginAtZero: true, position: "right", grid: { drawOnChartArea: false }, ticks: { color: "#6F838B", precision: 0 }, title: { display: true, text: "Credited wickets", color: "#6F838B" } },
+        x: { grid: { display: false }, ticks: { color: "#64746d", maxRotation: 0, autoSkip: true } },
+        y: { beginAtZero: true, grid: { color: "#e9e5d9" }, ticks: { color: "#64746d" }, title: { display: true, text: "Batter runs", color: "#64746d" } },
+        y1: { beginAtZero: true, position: "right", grid: { drawOnChartArea: false }, ticks: { color: "#64746d", precision: 0 }, title: { display: true, text: "Credited wickets", color: "#64746d" } },
       },
       plugins: { tooltip: { callbacks: { afterBody: (items) => `Sample: ${countFormat.format(leaders[items[0].dataIndex].legal_balls)} legal balls` } } },
     }, "No matchup records meet the sample threshold.");
@@ -456,6 +594,7 @@
       const data = await requestJson("matchups", {
         bowler_id: byId("matchup-bowler").value,
         batter_id: byId("matchup-batter").value,
+        season: getSeasonSelection(),
         min_balls: byId("matchup-min-balls").value,
         page: state.matchupPage,
         page_size: PAGE_SIZE,
@@ -495,7 +634,7 @@
       { label: "Other / not credited", data: dismissal.map((item) => Math.max(0, item.events - item.bowler_credited)), backgroundColor: PALETTE[3], borderRadius: 3 },
     ], {
       indexAxis: "y",
-      scales: { x: { stacked: true, beginAtZero: true, grid: { color: "#e4ebea" }, ticks: { color: "#6F838B", precision: 0 }, title: { display: true, text: "Dismissal events", color: "#6F838B" } }, y: { stacked: true, grid: { display: false }, ticks: { color: "#6F838B", autoSkip: false } } },
+      scales: { x: { stacked: true, beginAtZero: true, grid: { color: "#e9e5d9" }, ticks: { color: "#64746d", precision: 0 }, title: { display: true, text: "Dismissal events", color: "#64746d" } }, y: { stacked: true, grid: { display: false }, ticks: { color: "#64746d", autoSkip: false } } },
       plugins: { tooltip: { callbacks: { label: (context) => ` ${context.dataset.label}: ${countFormat.format(context.parsed.x)}` } } },
     }, "No dismissal types are available for the selected filters.");
     const bowlers = (data.top_bowlers || []).slice(0, 12);
@@ -557,7 +696,7 @@
       const data = await requestJson("wickets", {
         bowler_id: byId("wicket-bowler").value,
         phase: byId("wicket-phase").value,
-        season: byId("wicket-season").value,
+        season: getSeasonSelection() || byId("wicket-season").value,
         dismissal_type: byId("dismissal-filter").value,
         page: state.wicketPage,
         page_size: PAGE_SIZE,
@@ -581,9 +720,12 @@
     const container = byId("dataset-metadata");
     const heading = element("div", "dataset-profile-heading");
     const details = element("div", "dataset-profile-summary");
+    const storage = Number.isFinite(dataset.size_bytes)
+      ? `${(dataset.size_bytes / 1024 / 1024).toFixed(2)} MB`
+      : "PostgreSQL view";
     details.append(
       element("strong", "", dataset.name),
-      element("span", "", `${countFormat.format(profile.rows)} records · ${profile.column_count} columns · ${(dataset.size_bytes / 1024 / 1024).toFixed(2)} MB`),
+      element("span", "", `${countFormat.format(profile.rows)} records · ${profile.column_count} columns · ${storage}`),
       element("span", "", dataset.path),
     );
     const integrity = element("span", dataset.integrity_status === "VERIFIED" ? "integrity-tag verified" : "integrity-tag", dataset.integrity_status || "Integrity status unavailable");
@@ -695,11 +837,26 @@
     }
   }
 
+  function refreshSituationValues() {
+    if (!state.options) return;
+    const type = byId("dashboard-situation-type").value;
+    const group = state.options.situations.find((item) => item.type === type);
+    const values = group ? group.values : [];
+    setSelect(
+      byId("dashboard-situation-value"),
+      values,
+      "All values",
+      (value) => value,
+      (value) => value,
+    );
+  }
+
   async function loadFilterOptions() {
     announceDashboardStatus("checking", "Checking dashboard data");
     const options = await requestJson("options");
     if (!Array.isArray(options.phases) || !Array.isArray(options.seasons) ||
-        !Array.isArray(options.dismissal_types) || !Array.isArray(options.bowlers) || !Array.isArray(options.batters)) {
+        !Array.isArray(options.dismissal_types) || !Array.isArray(options.bowlers) ||
+        !Array.isArray(options.batters) || !Array.isArray(options.situations)) {
       throw new DashboardError("The dashboard filter options have an invalid response format.");
     }
     state.options = options;
@@ -707,12 +864,24 @@
       setSelect(byId(id), options.phases, "All phases", (value) => value, (value) => value);
     }
     setSelect(byId("wicket-season"), options.seasons.filter((season) => season !== "Unresolved"), "All available seasons", (value) => value, (value) => value);
+    for (const id of ["global-season", "global-season-analytics"]) { const element = byId(id); if (element) setSelect(element, options.seasons.filter((season) => season !== "Unresolved"), "All seasons", (value) => value, (value) => value); }
+    applyDefaultSeason(options);
     setSelect(byId("dismissal-filter"), options.dismissal_types, "All dismissal types", (value) => value, (value) => value);
     setPlayerSelect(byId("bowler-select"), options.bowlers, "Select a bowler");
+    setPlayerSelect(byId("batter-intelligence-select"), options.batters, "All batters");
     setPlayerSelect(byId("matchup-bowler"), options.bowlers, "All bowlers");
     setPlayerSelect(byId("matchup-batter"), options.batters, "All batters");
     setPlayerSelect(byId("phase-bowler"), options.bowlers, "All bowlers");
     setPlayerSelect(byId("wicket-bowler"), options.bowlers, "All bowlers");
+    setPlayerSelect(byId("situation-bowler"), options.bowlers, "All bowlers");
+    setSelect(
+      byId("dashboard-situation-type"),
+      options.situations,
+      "All situations",
+      (item) => item.type,
+      (item) => item.type,
+    );
+    refreshSituationValues();
     announceDashboardStatus("ready", "Dashboard API connected");
     return options;
   }
@@ -758,8 +927,10 @@
   function loadActiveAnalyticsTab() {
     const loaders = {
       "bowler-analytics": loadBowler,
+      "batter-intelligence": loadBatters,
       "matchup-analytics": loadMatchups,
       "phase-analysis": loadPhaseDetail,
+      "situation-analysis": loadSituations,
       "wicket-analysis": loadWickets,
     };
     const load = loaders[state.activeTab];
@@ -784,7 +955,10 @@
   }
 
   function activateAnalyticsTab(tab) {
-    const validTabs = ["bowler-analytics", "matchup-analytics", "phase-analysis", "wicket-analysis"];
+    const validTabs = [
+      "bowler-analytics", "batter-intelligence", "matchup-analytics",
+      "phase-analysis", "situation-analysis", "wicket-analysis",
+    ];
     state.activeTab = validTabs.includes(tab) ? tab : "bowler-analytics";
     document.querySelectorAll(".analytics-panel").forEach((panel) => {
       panel.hidden = panel.id !== state.activeTab;
@@ -810,8 +984,10 @@
     const hash = decodeURIComponent(location.hash.slice(1));
     const legacyTabs = {
       "bowler-performance": "bowler-analytics",
+      batters: "batter-intelligence",
       matchups: "matchup-analytics",
       phases: "phase-analysis",
+      situations: "situation-analysis",
       wickets: "wicket-analysis",
     };
     const tabId = document.getElementById(hash)?.classList.contains("analytics-panel")
@@ -828,15 +1004,20 @@
 
   function clearAllFilters() {
     byId("bowler-select").value = "";
+    byId("batter-intelligence-select").value = "";
     byId("matchup-bowler").value = "";
     byId("matchup-batter").value = "";
     byId("matchup-min-balls").value = "30";
     byId("phase-select").value = "";
     byId("phase-bowler").value = "";
+    byId("situation-bowler").value = "";
+    byId("dashboard-situation-type").value = "";
+    refreshSituationValues();
     byId("wicket-bowler").value = "";
     byId("wicket-phase").value = "";
-    byId("wicket-season").value = "";
     byId("dismissal-filter").value = "";
+    syncSeasonSelection("");
+    if (state.options && (state.options.seasons || []).includes("2022 onwards")) syncSeasonSelection("2022 onwards");
     byId("decision-min-balls").value = "30";
     state.matchupPage = 1;
     state.wicketPage = 1;
@@ -846,6 +1027,14 @@
 
   function bindEvents() {
     byId("bowler-select").addEventListener("change", loadBowler);
+    byId("batter-intelligence-select").addEventListener("change", loadBatters);
+    for (const id of ["situation-bowler", "dashboard-situation-value"]) {
+      byId(id).addEventListener("change", loadSituations);
+    }
+    byId("dashboard-situation-type").addEventListener("change", () => {
+      refreshSituationValues();
+      loadSituations();
+    });
     for (const id of ["matchup-bowler", "matchup-batter", "matchup-min-balls"]) {
       byId(id).addEventListener("change", () => {
         state.matchupPage = 1;
@@ -860,6 +1049,17 @@
         state.wicketPage = 1;
         loadWickets();
       });
+    }
+    for (const id of ["global-season", "global-season-analytics"]) {
+      const element = byId(id);
+      if (element) {
+        element.addEventListener("change", () => {
+          syncSeasonSelection(element.value);
+          state.wicketPage = 1;
+          loadOverview();
+          loadActiveAnalyticsTab();
+        });
+      }
     }
     byId("wicket-prev").addEventListener("click", () => { state.wicketPage = Math.max(1, state.wicketPage - 1); loadWickets(); });
     byId("wicket-next").addEventListener("click", () => { state.wicketPage += 1; loadWickets(); });
@@ -981,6 +1181,7 @@
       const data = await requestJson("bowler", {
         bowler_id: byId("phase-bowler").value,
         phase: byId("phase-select").value,
+        season: getSeasonSelection(),
         min_balls: 30,
       });
       if (requestVersion !== state.requestVersions.phase) return;
@@ -1022,6 +1223,8 @@
 
   async function start() {
     bindEvents();
+    const loading = byId("app-loading");
+    if (loading) loading.hidden = false;
     try {
       await loadFilterOptions();
       await loadOverview();
@@ -1030,9 +1233,14 @@
       announceDashboardStatus("error", "Dashboard analytics unavailable");
       showNotice(error.message || "Dashboard filter options could not be loaded.", true);
       setComponentState("kpi-error", error.message || "Dashboard filter options are unavailable.", retryDashboardOptions);
-      for (const id of ["bowler-error", "matchup-error", "phase-error", "wicket-error"]) {
+      for (const id of [
+        "bowler-error", "batter-intelligence-error", "matchup-error",
+        "phase-error", "situation-error", "wicket-error",
+      ]) {
         setComponentState(id, error.message || "Dashboard filters are unavailable.");
       }
+    } finally {
+      if (loading) loading.hidden = true;
     }
   }
 

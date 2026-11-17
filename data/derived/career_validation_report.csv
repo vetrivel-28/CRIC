@@ -1,0 +1,12 @@
+check,result
+source_delivery_rows,966985
+unique_delivery_keys,966985
+duplicate_delivery_key_rows,0
+bowler_rows,3190
+credited_wickets_from_wickets_source,48983
+credited_wickets_in_existing_wicket_events,48983
+credited_wicket_total_matches,True
+negative_bowler_runs_rows,0
+legal_balls_total,925882
+zero_legal_ball_bowlers,1
+missing_bowler_ids,0

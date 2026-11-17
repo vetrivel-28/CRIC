@@ -13,10 +13,10 @@ The engine reads, without modifying:
 | Local dataset | Required fields used |
 |---|---|
 | `players.csv` | `player_id`, `player_name`; identifies known batter IDs |
-| `bowler_career_performance_v1.csv` | `bowler_id`, `bowler_name`, `legal_balls`, `economy`, `bowling_strike_rate_balls_per_wicket`, `wicket_rate_per_100_legal_balls` |
-| `bowler_phase_performance_v1.csv` | `bowler_id`, `bowler_name`, `match_phase`, `legal_balls`, same rate fields |
-| `bowler_batter_matchup_stats_v2.csv` | `bowler_id`, `batter_id`, `balls`, `runs_conceded_by_bowler`, `wickets`; optional phase-specific balls/runs/wickets columns |
-| `bowler_situation_stats_v2.csv` | `bowler_id`, `situation_type`, `situation_value`, `balls`, `runs_conceded`, `wickets` |
+| `bowler_career_performance_v1.csv` | Required: `bowler_id`, `bowler_name`, `legal_balls`, `economy`, `bowling_strike_rate_balls_per_wicket`, `wicket_rate_per_100_legal_balls`; details: `runs_conceded`, `wickets`, `dot_balls`, `dot_ball_pct` |
+| `bowler_phase_performance_v1.csv` | Required: `bowler_id`, `bowler_name`, `match_phase`, `legal_balls`, same rate fields; details: `runs_conceded`, `wickets`, `dot_balls`, `dot_ball_pct` |
+| `bowler_batter_matchup_stats_v2.csv` | Required: `bowler_id`, `batter_id`, `balls`, `runs_conceded_by_bowler`, `wickets`; details: `dot_balls`, `dot_ball_pct`; optional phase-specific balls/runs/wickets/dots columns |
+| `bowler_situation_stats_v2.csv` | Required: `bowler_id`, `situation_type`, `situation_value`, `balls`, `runs_conceded`, `wickets`; details: `dot_balls`, `dot_ball_pct` |
 
 The discovered phase labels are `Powerplay`, `Middle`, and `Death`. Situation types include `phase`, `exact_over`, `innings`, `competition`, `opposition`, `season`, and `venue`. Actual values are selected from the installed CSVs; no bowler style is present or inferred.
 
@@ -88,19 +88,31 @@ Unknown batter or bowler IDs return a validation error. A known batter with no b
           "economy": 5.0,
           "bowling_strike_rate_balls_per_wicket": 12.0,
           "wicket_rate_per_100_legal_balls": 8.33,
-          "sample_balls": 60.0
+          "sample_balls": 60.0,
+          "runs_conceded": 50.0,
+          "dismissals": 5.0,
+          "dot_balls": 30.0,
+          "dot_ball_pct": 50.0
         },
         "matchup": {
           "economy": 4.8,
           "bowling_strike_rate_balls_per_wicket": 10.0,
           "wicket_rate_per_100_legal_balls": 10.0,
-          "sample_balls": 10.0
+          "sample_balls": 10.0,
+          "runs_conceded": 8.0,
+          "dismissals": 1.0,
+          "dot_balls": 5.0,
+          "dot_ball_pct": 50.0
         },
         "situation": {
           "economy": 5.0,
           "bowling_strike_rate_balls_per_wicket": 10.0,
           "wicket_rate_per_100_legal_balls": 10.0,
-          "sample_balls": 60.0
+          "sample_balls": 60.0,
+          "runs_conceded": 50.0,
+          "dismissals": 6.0,
+          "dot_balls": 30.0,
+          "dot_ball_pct": 50.0
         }
       },
       "score_components": {
@@ -109,9 +121,9 @@ Unknown batter or bowler IDs return a validation error. A known batter with no b
         "situation": 83.33
       },
       "evidence": [
-        "Performance evidence contributes 83.3/100 after sample-size adjustment.",
-        "Matchup evidence contributes 62.5/100 after sample-size adjustment.",
-        "Situation evidence contributes 83.3/100 after sample-size adjustment."
+        "Performance component score: 83.3/100 after metric sample adjustment using economy (runs per six legal balls) 5.00, bowling strike rate (legal balls per credited wicket) 12.00, credited-wicket rate per 100 legal balls 8.33 over 60 legal balls; effective weight 60.0% of this candidate's overall score.",
+        "Matchup component score: 62.5/100 after metric sample adjustment using economy (runs per six legal balls) 4.80, bowling strike rate (legal balls per credited wicket) 10.00, credited-wicket rate per 100 legal balls 10.00 over 10 legal balls; effective weight 30.0% of this candidate's overall score.",
+        "Situation component score: 83.3/100 after metric sample adjustment using economy (runs per six legal balls) 5.00, bowling strike rate (legal balls per credited wicket) 10.00, credited-wicket rate per 100 legal balls 10.00 over 60 legal balls; effective weight 10.0% of this candidate's overall score."
       ],
       "warnings": ["matchup: very_small_sample (10 balls)"],
       "data_availability": {
@@ -132,19 +144,31 @@ Unknown batter or bowler IDs return a validation error. A known batter with no b
           "economy": 7.0,
           "bowling_strike_rate_balls_per_wicket": 30.0,
           "wicket_rate_per_100_legal_balls": 3.33,
-          "sample_balls": 30.0
+          "sample_balls": 30.0,
+          "runs_conceded": 35.0,
+          "dismissals": 1.0,
+          "dot_balls": 9.0,
+          "dot_ball_pct": 30.0
         },
         "matchup": {
           "economy": 8.0,
           "bowling_strike_rate_balls_per_wicket": 30.0,
           "wicket_rate_per_100_legal_balls": 3.3333333333333335,
-          "sample_balls": 30.0
+          "sample_balls": 30.0,
+          "runs_conceded": 40.0,
+          "dismissals": 1.0,
+          "dot_balls": 15.0,
+          "dot_ball_pct": 50.0
         },
         "situation": {
           "economy": 9.0,
           "bowling_strike_rate_balls_per_wicket": 30.0,
           "wicket_rate_per_100_legal_balls": 3.3333333333333335,
-          "sample_balls": 30.0
+          "sample_balls": 30.0,
+          "runs_conceded": 45.0,
+          "dismissals": 1.0,
+          "dot_balls": 9.0,
+          "dot_ball_pct": 30.0
         }
       },
       "score_components": {
@@ -153,9 +177,9 @@ Unknown batter or bowler IDs return a validation error. A known batter with no b
         "situation": 25.0
       },
       "evidence": [
-        "Performance evidence contributes 25.0/100 after sample-size adjustment.",
-        "Matchup evidence contributes 25.0/100 after sample-size adjustment.",
-        "Situation evidence contributes 25.0/100 after sample-size adjustment."
+        "Performance component score: 25.0/100 after metric sample adjustment using economy (runs per six legal balls) 7.00, bowling strike rate (legal balls per credited wicket) 30.00, credited-wicket rate per 100 legal balls 3.33 over 30 legal balls; effective weight 60.0% of this candidate's overall score.",
+        "Matchup component score: 25.0/100 after metric sample adjustment using economy (runs per six legal balls) 8.00, bowling strike rate (legal balls per credited wicket) 30.00, credited-wicket rate per 100 legal balls 3.33 over 30 legal balls; effective weight 30.0% of this candidate's overall score.",
+        "Situation component score: 25.0/100 after metric sample adjustment using economy (runs per six legal balls) 9.00, bowling strike rate (legal balls per credited wicket) 30.00, credited-wicket rate per 100 legal balls 3.33 over 30 legal balls; effective weight 10.0% of this candidate's overall score."
       ],
       "warnings": [],
       "data_availability": {
@@ -174,7 +198,7 @@ Unknown batter or bowler IDs return a validation error. A known batter with no b
 
 This response is generated by the deterministic test fixture in `tests/test_recommendation_engine.py`. The recommendation is synthetic and does not describe an actual player or match.
 
-`score` is rounded to 2 decimals. It is candidate-relative, not a probability, calibrated confidence, or learned prediction. Excluded entries include `bowler_id` and a clear reason (`unavailable` or `no_overs_remaining`). A valid empty candidate list returns an empty `recommendations` array and an explanatory warning.
+`score` is rounded to 2 decimals. It is candidate-relative, not a probability, calibrated confidence, or learned prediction. `sample_reliability` is displayed as a heuristic, not as confidence. Each available metrics group includes its source runs conceded, bowler-credited dismissals, dot-ball count, dot-ball percentage, and legal-ball sample when those detail columns exist in the validated aggregate. `dot_ball_pct` is `100 * dot_balls / legal_balls`; zero-ball percentages remain unavailable. For phase-filtered matchup details, the phase-specific aggregate columns are used. Excluded entries include `bowler_id` and a clear reason (`unavailable` or `no_overs_remaining`). A valid empty candidate list returns an empty `recommendations` array and an explanatory warning.
 
 ## Validation/error contract
 
@@ -186,7 +210,7 @@ This response is generated by the deterministic test fixture in `tests/test_reco
 | 413 | `request_too_large` | Request body exceeds 1 MiB |
 | 500 | `internal_error` | Unexpected server error; response does not expose paths, data rows, stack traces, or internal details |
 
-Errors use `{ "error": { "code": "...", "message": "..." } }`. `sample_reliability` is the unweighted mean of the reliability terms for the defined metric/source observations contributing to the score; it is not a calibrated confidence probability. Logs record only the error category and never request bodies, player context, secrets, stack traces, or source file contents.
+Errors use `{ "error": { "code": "...", "message": "..." } }`. `sample_reliability` is the unweighted mean of the reliability terms for the defined metric/source observations contributing to the score; it is not a calibrated confidence probability. Component explanations include the observed scoring metrics, their evidence sample size, score contribution, and effective component weight. Logs record only the error category and never request bodies, player context, secrets, stack traces, or source file contents.
 
 ## Deterministic scoring contract
 
@@ -232,6 +256,7 @@ Sample warnings: fewer than 12 balls is `very_small_sample`; 12–29 is `limited
 - Legal balls: `is_legal_delivery == True`.
 - Bowler runs conceded: `runs_batter + extra_wides + extra_noballs`; byes, leg-byes and penalty runs are excluded.
 - Bowler-credited wickets: count only `wicket_events.is_bowler_credited == True`; keep wicket events separate from credited wickets.
+- Dot balls: legal deliveries with `runs_total == 0`; dot-ball percentage denominator is the legal-ball sample.
 - Do not discard a valid zero-legal-ball bowler. Its undefined economy, strike rate, and wicket rate stay unavailable/null.
 - Preserve documented group grains: career `(bowler_id, bowler_name)`, phase `(bowler_id, match_phase)`, matchup `(bowler_id, batter_id)`, situation `(bowler_id, situation_type, situation_value)`.
 - No source record is edited by scoring or serving a request.

@@ -1,13 +1,14 @@
 param(
     [ValidateRange(1024, 65535)]
-    [int]$Port = 8765
+    [int]$Port = 8765,
+    [ValidateSet("postgres", "csv")]
+    [string]$Source = "postgres"
 )
 
 $ErrorActionPreference = "Stop"
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $dataRoot = Join-Path $projectRoot "data"
-
-if (-not (Test-Path -LiteralPath $dataRoot -PathType Container)) {
+if ($Source -eq "csv" -and -not (Test-Path -LiteralPath $dataRoot -PathType Container)) {
     Write-Error "CRIC data directory is missing: $dataRoot"
     exit 1
 }
@@ -49,11 +50,16 @@ try {
     }
 
     Set-Location -LiteralPath $projectRoot
-    Write-Host "Starting CRIC with historical datasets from $dataRoot"
+    if ($Source -eq "postgres") {
+        Write-Host "Starting CRIC with PostgreSQL analytics. Configure CRIC_DB_* or PG* environment variables."
+    }
+    else {
+        Write-Host "Starting CRIC in explicit CSV mode with historical datasets from $dataRoot"
+    }
     Write-Host "Open http://127.0.0.1:$Port/ after the local service reports ready."
     Write-Host "Press Ctrl+C in this window to stop the service."
 
-    & $python.Source -m backend.api --data-root $dataRoot --port $Port
+    & $python.Source -m backend.api --source $Source --data-root $dataRoot --port $Port
     if ($LASTEXITCODE -ne 0) {
         Write-Error "The CRIC local service exited with code $LASTEXITCODE."
         exit $LASTEXITCODE

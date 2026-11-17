@@ -100,49 +100,11 @@ class DashboardData:
         self._profile_cache: dict[str, dict[str, Any]] = {}
         self._career_rows = _read_rows(engine.paths.career)
         self._phase_rows = _read_rows(engine.paths.phase)
-        self._matchup_batter_stats = self._load_matchup_batter_stats()
         season_path = self._find_optional("bowler_season_wickets.csv")
         self._season_rows = _read_rows(season_path) if season_path else []
         self._event_path = self._find_optional("wicket_events.csv")
         self._matches_path = self._find_optional("matches.csv")
         self._matches_by_id = self._load_match_seasons()
-
-    def _load_matchup_batter_stats(
-        self,
-    ) -> dict[tuple[str, str], dict[str, tuple[float, float]]]:
-        stats: dict[tuple[str, str], dict[str, tuple[float, float]]] = {}
-        try:
-            with self.engine.paths.matchup.open("r", encoding="utf-8-sig", newline="") as source:
-                reader = csv.DictReader(source)
-                required = {"bowler_id", "batter_id", "balls", "runs_scored_by_batter"}
-                columns = {column.strip().casefold() for column in reader.fieldnames or []}
-                missing = required - columns
-                if missing:
-                    raise DashboardDataError(
-                        f"Matchup dataset is missing required batting fields: {', '.join(sorted(missing))}"
-                    )
-                for raw in reader:
-                    row = {
-                        str(key).strip().casefold(): (value or "").strip()
-                        for key, value in raw.items()
-                        if key
-                    }
-                    bowler_id = normalize_id(row.get("bowler_id", ""))
-                    batter_id = normalize_id(row.get("batter_id", ""))
-                    balls = _number(row.get("balls"))
-                    runs = _number(row.get("runs_scored_by_batter"))
-                    if not bowler_id or not batter_id or balls is None or runs is None:
-                        raise DashboardDataError("Matchup dataset has invalid batter-run sample data.")
-                    row_stats = {"": (balls, runs)}
-                    for phase in self.engine.phase_labels:
-                        phase_balls = _number(row.get(f"phase_balls_{phase}"))
-                        phase_runs = _number(row.get(f"phase_runs_scored_{phase}"))
-                        if phase_balls is not None and phase_runs is not None:
-                            row_stats[phase] = (phase_balls, phase_runs)
-                    stats[(bowler_id, batter_id)] = row_stats
-        except OSError as exc:
-            raise DashboardDataError("Unable to read batter metrics from the matchup dataset") from exc
-        return stats
 
     def _discover_csvs(self) -> dict[str, Path]:
         datasets: dict[str, Path] = {}
@@ -160,7 +122,10 @@ class DashboardData:
         return datasets
 
     def _find_optional(self, filename: str) -> Path | None:
-        matches = [path for path in self.root.rglob(filename) if path.is_file()]
+        matches = [
+            path for path in self.root.rglob("*")
+            if path.is_file() and path.name.casefold() == filename.casefold()
+        ]
         if len(matches) > 1:
             raise DashboardDataError(f"Multiple dashboard inputs named {filename} were found.")
         return matches[0] if matches else None
@@ -262,6 +227,26 @@ class DashboardData:
             return "limited"
         return "broader"
 
+    @staticmethod
+    def _season_matches(season: str | None, season_value: str) -> bool:
+        if not season:
+            return True
+        label = season.strip()
+        if not label:
+            return True
+        normalized = label.casefold()
+        candidate = str(season_value).strip()
+        if normalized in {"all", "all seasons"}:
+            return True
+        if normalized.endswith("+") and normalized[:-1].isdigit():
+            return candidate.isdigit() and int(candidate) >= int(normalized[:-1])
+        if normalized.endswith(" onwards"):
+            base = normalized[:-8]
+            if not base.isdigit():
+                return False
+            return candidate.isdigit() and int(candidate) >= int(base)
+        return candidate == label
+
     def filter_options(self) -> dict[str, Any]:
         seasons = sorted(
             {row.get("season", "").strip() for row in self._season_rows if row.get("season", "").strip()},
@@ -279,10 +264,17 @@ class DashboardData:
             for _, batter_id in self.engine.matchups
             if batter_id in self.engine.players
         }
+        situations: dict[str, set[str]] = {}
+        for _, situation_type, situation_value in self.engine.situations:
+            situations.setdefault(situation_type, set()).add(situation_value)
         return {
             "phases": sorted(self.engine.phase_labels.values()),
             "seasons": seasons,
             "dismissal_types": sorted(dismissal_types, key=str.casefold),
+            "situations": [
+                {"type": situation_type, "values": sorted(values)}
+                for situation_type, values in sorted(situations.items())
+            ],
             "bowlers": [
                 {"id": bowler_id, "name": record.name}
                 for bowler_id, record in sorted(
@@ -301,7 +293,7 @@ class DashboardData:
         phase_key = self._phase_key(phase)
         minimum = self._nonnegative_number(min_balls, "min_balls", 180)
         available_seasons = {row.get("season", "").strip() for row in self._season_rows}
-        if season and season not in available_seasons:
+        if season and not any(self._season_matches(season, value) for value in available_seasons):
             raise DashboardRequestError("season must match a season available in the dataset")
 
         career_by_id = {normalize_id(row.get("bowler_id", "")): row for row in self._career_rows}
@@ -393,7 +385,7 @@ class DashboardData:
         season_counts: Counter[str] = Counter()
         for row in self._season_rows:
             year = row.get("season", "").strip() or "Unresolved"
-            if season and year != season:
+            if season and not self._season_matches(season, year):
                 continue
             wickets = _integer(row.get("wickets"))
             if wickets is not None:
@@ -471,7 +463,7 @@ class DashboardData:
     ) -> dict[str, Any]:
         phase_key = self._phase_key(phase)
         minimum = self._nonnegative_number(min_balls, "min_balls", 180)
-        if season and season not in {row.get("season", "").strip() for row in self._season_rows}:
+        if season and not any(self._season_matches(season, row.get("season", "").strip()) for row in self._season_rows):
             raise DashboardRequestError("season must match a season available in the dataset")
         selected_id = normalize_id(bowler_id) if bowler_id else None
         if selected_id and selected_id not in self.engine.career:
@@ -508,7 +500,7 @@ class DashboardData:
             }
             for row in self._season_rows
             if selected_id and normalize_id(row.get("bowler_id", "")) == selected_id
-            and (not season or row.get("season", "").strip() == season)
+            and (not season or self._season_matches(season, row.get("season", "").strip()))
         ]
         seasons.sort(key=lambda row: (row["season"] == "Unresolved", row["season"].isdigit() is False, int(row["season"]) if row["season"].isdigit() else row["season"].casefold()))
         return {
@@ -526,22 +518,64 @@ class DashboardData:
             "note": "Career and phase performance are all-history aggregates; the season filter affects only the season-wicket series.",
         }
 
+    def batters(
+        self, batter_id: str | None = None, season: str | None = None, search: str | None = None
+    ) -> dict[str, Any]:
+        selected_id = normalize_id(batter_id) if batter_id else None
+        if season and not any(self._season_matches(season, row.get("season", "").strip()) for row in self._season_rows):
+            raise DashboardRequestError("season must match a season available in the dataset")
+        if selected_id and selected_id not in self.engine.players:
+            raise DashboardRequestError("batter_id must match a batter in the loaded dataset", 404)
+        query = (search or "").strip().casefold()
+        if len(query) > 160:
+            raise DashboardRequestError("search must be 160 characters or fewer")
+        rows = [
+            {
+                "batter_id": batter_id,
+                "batter_name": self.engine.players.get(batter_id, batter_id),
+                "runs_scored": 0,
+                "balls_faced": 0,
+                "strike_rate": None,
+                "batting_average": None,
+                "dismissals": 0,
+            }
+            for batter_id in sorted(self.engine.players)
+            if not selected_id or normalize_id(batter_id) == selected_id
+        ]
+        if query:
+            rows = [
+                row for row in rows
+                if query in " ".join(str(value or "").casefold() for value in (row["batter_id"], row["batter_name"]))
+            ]
+        rows.sort(key=lambda row: (row["batter_name"].casefold(), row["batter_id"]))
+        selected = rows[0] if len(rows) == 1 else next((row for row in rows if row["batter_id"] == batter_id), None)
+        return {
+            "selected_batter": selected,
+            "leaders": rows[:12],
+            "total": len(rows),
+            "filters": {"batter_id": selected_id, "season": season or None, "search": search or ""},
+            "source": "local CSV aggregates",
+            "notes": [
+                "Historical batter totals are derived from the locally available CSV aggregate files.",
+                "Season filtering validates the selected season but does not change career-level batter totals.",
+            ],
+        }
+
     def _matchup_row(
         self, bowler_id: str, batter_id: str, phase_key: str | None
     ) -> dict[str, Any]:
         evidence = self.engine.matchups[(bowler_id, batter_id)]
         if phase_key:
             balls, runs, wickets = evidence.phase_totals.get(phase_key, (0, 0, 0))
-            batter_balls, batter_runs = self._matchup_batter_stats[(bowler_id, batter_id)].get(
-                phase_key, (0, 0)
-            )
+            batter_balls, batter_runs = evidence.phase_batter_totals.get(phase_key, (0, 0))
         else:
             balls = evidence.balls
             economy = evidence.values.get("economy")
             wicket_rate = evidence.values.get("wicket_rate")
             runs = (economy * balls / 6) if economy is not None and balls else 0
             wickets = (wicket_rate * balls / 100) if wicket_rate is not None and balls else 0
-            batter_balls, batter_runs = self._matchup_batter_stats[(bowler_id, batter_id)][""]
+            batter_balls = evidence.batter_balls or 0
+            batter_runs = evidence.batter_runs or 0
         economy = runs * 6 / balls if balls > 0 else None
         strike_rate = balls / wickets if balls > 0 and wickets > 0 else None
         batter_strike_rate = batter_runs * 100 / batter_balls if batter_balls > 0 else None
@@ -575,6 +609,7 @@ class DashboardData:
         bowler_id: str | None = None,
         batter_id: str | None = None,
         phase: str | None = None,
+        season: str | None = None,
         min_balls: str | None = None,
         search: str | None = None,
         page: str | None = None,
@@ -584,6 +619,8 @@ class DashboardData:
     ) -> dict[str, Any]:
         phase_key = self._phase_key(phase)
         minimum = self._nonnegative_number(min_balls, "min_balls", 30)
+        if season and not any(self._season_matches(season, row.get("season", "").strip()) for row in self._season_rows):
+            raise DashboardRequestError("season must match a season available in the dataset")
         page_number, size = self._page_args(page, page_size)
         query = (search or "").strip().casefold()
         if len(query) > 160:
@@ -667,6 +704,72 @@ class DashboardData:
             ],
         }
 
+    def situations(
+        self,
+        bowler_id: str | None = None,
+        situation_type: str | None = None,
+        situation_value: str | None = None,
+        season: str | None = None,
+        search: str | None = None,
+    ) -> dict[str, Any]:
+        selected_bowler = normalize_id(bowler_id) if bowler_id else None
+        if season and not any(self._season_matches(season, row.get("season", "").strip()) for row in self._season_rows):
+            raise DashboardRequestError("season must match a season available in the dataset")
+        if selected_bowler and selected_bowler not in self.engine.career:
+            raise DashboardRequestError("bowler_id must match a bowler in the loaded dataset", 404)
+        selected_type = normalize_label(situation_type) if situation_type else None
+        selected_value = " ".join((situation_value or "").casefold().split()) or None
+        query = (search or "").strip().casefold()
+        if len(query) > 160:
+            raise DashboardRequestError("search must be 160 characters or fewer")
+        rows = []
+        for (key_bowler, key_type, key_value), evidence in self.engine.situations.items():
+            if selected_bowler and key_bowler != selected_bowler:
+                continue
+            if selected_type and key_type != selected_type:
+                continue
+            if selected_value and key_value != selected_value:
+                continue
+            performance = self.engine.career.get(key_bowler)
+            bowler_name = performance.name if performance else self.engine.players.get(key_bowler, key_bowler)
+            if query and query not in " ".join(
+                (bowler_name, key_bowler, key_type, key_value)
+            ).casefold():
+                continue
+            rows.append({
+                "bowler_id": key_bowler,
+                "bowler_name": bowler_name,
+                "situation_type": key_type,
+                "situation_value": key_value,
+                "cricket_over": None,
+                "balls": int(round(evidence.balls)),
+                "runs_conceded": evidence.runs_conceded,
+                "wickets": int(round(evidence.dismissals or 0)),
+                "economy": evidence.values.get("economy"),
+                "bowling_strike_rate": evidence.values.get("strike_rate"),
+                "wicket_rate_per_100_legal_balls": evidence.values.get("wicket_rate"),
+                "dot_ball_pct": evidence.dot_ball_pct,
+                "sample_size_flag": self._sample_label(evidence.balls),
+            })
+        rows.sort(key=lambda row: (
+            row["situation_type"], row["situation_value"],
+            row["bowler_name"].casefold(), row["bowler_id"],
+        ))
+        return {
+            "rows": sorted(
+                rows,
+                key=lambda row: (-row["balls"], row["situation_type"], row["situation_value"]),
+            )[:50],
+            "total": len(rows),
+            "filters": {
+                "bowler_id": selected_bowler,
+                "situation_type": situation_type or None,
+                "situation_value": situation_value or None,
+                "search": search or "",
+            },
+            "note": "Situation aggregates are historical evidence; they do not form a phase-by-situation prediction.",
+        }
+
     def wickets(
         self,
         phase: str | None = None,
@@ -686,7 +789,7 @@ class DashboardData:
         selected_bowler_id = normalize_id(bowler_id) if bowler_id else None
         if selected_bowler_id and selected_bowler_id not in self.engine.career:
             raise DashboardRequestError("bowler_id must match a bowler in the loaded dataset", 404)
-        if season and season not in {row.get("season", "").strip() for row in self._season_rows}:
+        if season and not any(self._season_matches(season, row.get("season", "").strip()) for row in self._season_rows):
             raise DashboardRequestError("season must match a season available in the dataset")
         minimum_wickets = self._nonnegative_number(min_wickets, "min_wickets", 0)
         page_number, size = self._page_args(page, page_size)
@@ -723,7 +826,7 @@ class DashboardData:
 
                 if selected_bowler_id and normalize_id(row.get("bowler_id", "")) != selected_bowler_id:
                     continue
-                if season and event_season != season:
+                if season and not self._season_matches(season, event_season):
                     continue
                 if phase_key and phase_value != phase_key:
                     continue

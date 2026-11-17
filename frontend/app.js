@@ -423,6 +423,10 @@
     if (!item || !Number.isInteger(item.rank) || typeof item.bowler_id !== "string" ||
         typeof item.bowler_name !== "string" || seenIds.has(item.bowler_id) ||
         !(item.score === null || (Number.isFinite(item.score) && item.score >= 0 && item.score <= 100)) ||
+        !(item.sample_reliability === null || (
+          Number.isFinite(item.sample_reliability) &&
+          item.sample_reliability >= 0 && item.sample_reliability <= 1
+        )) ||
         !item.metrics || typeof item.metrics !== "object" ||
         !Array.isArray(item.evidence) || !item.evidence.every((line) => typeof line === "string") ||
         !Array.isArray(item.warnings) || !item.warnings.every((line) => typeof line === "string") ||
@@ -437,6 +441,15 @@
           !isFiniteOrNull(metricGroup.economy) ||
           !isFiniteOrNull(metricGroup.bowling_strike_rate_balls_per_wicket) ||
           !isFiniteOrNull(metricGroup.wicket_rate_per_100_legal_balls) ||
+          !isFiniteOrNull(metricGroup.runs_conceded) ||
+          !isFiniteOrNull(metricGroup.dismissals) ||
+          !isFiniteOrNull(metricGroup.dot_balls) ||
+          !isFiniteOrNull(metricGroup.dot_ball_pct) ||
+          (metricGroup.runs_conceded !== null && metricGroup.runs_conceded < 0) ||
+          (metricGroup.dismissals !== null && metricGroup.dismissals < 0) ||
+          (metricGroup.dot_balls !== null && metricGroup.dot_balls < 0) ||
+          (metricGroup.dot_ball_pct !== null &&
+            (metricGroup.dot_ball_pct < 0 || metricGroup.dot_ball_pct > 100)) ||
           !Number.isFinite(metricGroup.sample_balls) || metricGroup.sample_balls < 0 ||
           !["no_legal_balls", "very_small_sample", "limited_sample", "broader_sample"]
             .includes(metricGroup.sample_assessment)) {
@@ -477,11 +490,15 @@
     return Number(value).toFixed(digits);
   }
 
-  function appendMetric(group, label, value, sampleBalls) {
+  function appendMetric(group, label, value, sampleBalls, digits = 2, suffix = "") {
     const item = node("div", "metric-item");
     item.append(node("span", "", label));
     const unavailable = value === null || value === undefined || !Number.isFinite(Number(value));
-    const strong = node("strong", unavailable ? "unavailable" : "", displayMetric(value));
+    const strong = node(
+      "strong",
+      unavailable ? "unavailable" : "",
+      unavailable ? "n/a" : `${displayMetric(value, digits)}${suffix}`,
+    );
     if (unavailable) {
       strong.title = sampleBalls === 0
         ? "No legal balls are available in this sample."
@@ -510,9 +527,11 @@
     }[availability] || "Historical evidence unavailable";
     card.append(node("h4", "", label));
     const grid = node("div", "metric-values");
+    appendMetric(grid, "Runs conceded", data ? data.runs_conceded : null, data && data.sample_balls);
+    appendMetric(grid, "Credited dismissals", data ? data.dismissals : null, data && data.sample_balls, 0);
     appendMetric(grid, "Economy", data ? data.economy : null, data && data.sample_balls);
-    appendMetric(grid, "Bowling strike rate", data ? data.bowling_strike_rate_balls_per_wicket : null, data && data.sample_balls);
-    appendMetric(grid, "Wicket rate / 100 legal balls", data ? data.wicket_rate_per_100_legal_balls : null, data && data.sample_balls);
+    appendMetric(grid, "Bowling strike rate (balls/wicket)", data ? data.bowling_strike_rate_balls_per_wicket : null, data && data.sample_balls);
+    appendMetric(grid, "Dot-ball percentage", data ? data.dot_ball_pct : null, data && data.sample_balls, 2, "%");
     card.append(grid);
     if (data) {
       const assessments = {
@@ -523,7 +542,8 @@
       };
       const [className, text] = assessments[data.sample_assessment];
       card.append(node("span", className, text));
-      card.append(node("p", "metric-sample", `Sample size: ${displayMetric(data.sample_balls, 0)} legal balls`));
+      const sampleLabel = source === "matchup" ? "Against selected batter" : "Sample size";
+      card.append(node("p", "metric-sample", `${sampleLabel}: ${displayMetric(data.sample_balls, 0)} legal balls`));
     } else {
       card.append(node("p", "metric-sample metric-sample-unavailable", statusText));
     }
@@ -592,6 +612,14 @@
         }[recommendation.data_availability.situation];
         availability.textContent = `Performance: ${performanceSource}; ${matchupSource}; ${situationSource}.`;
         detail.append(availability);
+        const reliability = recommendation.sample_reliability === null
+          ? "n/a"
+          : `${(recommendation.sample_reliability * 100).toFixed(1)}%`;
+        detail.append(node(
+          "p",
+          "reliability-line",
+          `Sample reliability heuristic: ${reliability}; not calibrated confidence or a prediction.`,
+        ));
         if (recommendation.evidence.length) {
           const evidence = node("ul", "detail-list");
           for (const line of recommendation.evidence) evidence.append(node("li", "", line));

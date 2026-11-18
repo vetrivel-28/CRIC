@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "65b67fa1db7ac62a",
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_career_performance"
+                    }
+                  },
+                  "Property": "Credited Wickets"
+                }
+              },
+              "queryRef": "v_bowler_career_performance.Credited Wickets",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 30,
+    "y": 190,
+    "z": 1300,
+    "height": 230,
+    "width": 390,
+    "tabOrder": 3
+  }
+}

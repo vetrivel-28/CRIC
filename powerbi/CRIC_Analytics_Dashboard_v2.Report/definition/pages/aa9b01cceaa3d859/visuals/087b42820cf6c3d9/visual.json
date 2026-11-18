@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "087b42820cf6c3d9",
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_wicket"
+                    }
+                  },
+                  "Property": "Non-Bowler-Credited Dismissals"
+                }
+              },
+              "queryRef": "fact_wicket.Non-Bowler-Credited Dismissals",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 830,
+    "y": 70,
+    "z": 1200,
+    "height": 100,
+    "width": 390,
+    "tabOrder": 2
+  }
+}

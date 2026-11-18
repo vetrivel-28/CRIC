@@ -1,0 +1,73 @@
+table v_batter_career_performance
+	column batter_id
+		dataType: string
+		summarizeBy: none
+		sourceColumn: batter_id
+	column batter_name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: batter_name
+	column country
+		dataType: string
+		summarizeBy: none
+		sourceColumn: country
+	column batting_hand
+		dataType: string
+		summarizeBy: none
+		sourceColumn: batting_hand
+	column matches_batted
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: matches_batted
+	column innings_batted
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: innings_batted
+	column balls_faced
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: balls_faced
+	column runs_scored
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: runs_scored
+	column dismissals
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: dismissals
+	column fours
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: fours
+	column sixes
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: sixes
+	column strike_rate
+		dataType: decimal
+		summarizeBy: average
+		sourceColumn: strike_rate
+	column batting_average
+		dataType: decimal
+		summarizeBy: average
+		sourceColumn: batting_average
+	measure 'Total Batters' = DISTINCTCOUNT(v_batter_career_performance[batter_id])
+		formatString: 0
+	measure 'Total Runs' = SUM(v_batter_career_performance[runs_scored])
+		formatString: 0
+	measure 'Total Batting Balls' = SUM(v_batter_career_performance[balls_faced])
+		formatString: 0
+	measure 'Batting Average' = DIVIDE([Total Runs], SUM(v_batter_career_performance[dismissals]), BLANK())
+		formatString: 0.00
+	measure 'Batting Strike Rate' = DIVIDE([Total Runs] * 100, [Total Batting Balls], BLANK())
+		formatString: 0.00
+	measure 'Batter Career' = [Total Runs]
+		formatString: 0
+	partition v_batter_career_performance = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "cric_analytics"),
+				    Item = Source{[Schema="cricket_analytics",Item="v_batter_career_performance"]}[Data]
+				in
+				    Item

@@ -1,0 +1,122 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "20e1c9417fdcad16",
+  "visual": {
+    "visualType": "table",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_career_performance"
+                    }
+                  },
+                  "Property": "bowler_name"
+                }
+              },
+              "queryRef": "v_bowler_career_performance.bowler_name",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_career_performance"
+                    }
+                  },
+                  "Property": "country"
+                }
+              },
+              "queryRef": "v_bowler_career_performance.country",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_career_performance"
+                    }
+                  },
+                  "Property": "bowling_category"
+                }
+              },
+              "queryRef": "v_bowler_career_performance.bowling_category",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_career_performance"
+                    }
+                  },
+                  "Property": "Total Legal Balls"
+                }
+              },
+              "queryRef": "v_bowler_career_performance.Total Legal Balls",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_career_performance"
+                    }
+                  },
+                  "Property": "Credited Wickets"
+                }
+              },
+              "queryRef": "v_bowler_career_performance.Credited Wickets",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_career_performance"
+                    }
+                  },
+                  "Property": "Economy Rate"
+                }
+              },
+              "queryRef": "v_bowler_career_performance.Economy Rate",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_career_performance"
+                    }
+                  },
+                  "Property": "Bowling Strike Rate"
+                }
+              },
+              "queryRef": "v_bowler_career_performance.Bowling Strike Rate",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 430,
+    "y": 70,
+    "z": 1100,
+    "height": 100,
+    "width": 390,
+    "tabOrder": 1
+  }
+}

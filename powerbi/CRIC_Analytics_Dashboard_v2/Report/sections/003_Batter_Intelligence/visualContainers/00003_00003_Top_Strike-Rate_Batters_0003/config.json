@@ -1,0 +1,41 @@
+{
+  "name": "00003_00003_Top_Strike-Rate_Batters",
+  "layouts": [
+    {
+      "id": 0,
+      "position": {
+        "x": 860,
+        "y": 88,
+        "z": 1000,
+        "width": 380,
+        "height": 260
+      }
+    }
+  ],
+  "singleVisual": {
+    "visualType": "barChart",
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "\"Top Strike-Rate Batters\""
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "a58f220bc24759b4",
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_season_bowling_performance"
+                    }
+                  },
+                  "Property": "season"
+                }
+              },
+              "queryRef": "v_season_bowling_performance.season",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_season_bowling_performance"
+                    }
+                  },
+                  "Property": "Season Wickets"
+                }
+              },
+              "queryRef": "v_season_bowling_performance.Season Wickets",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 830,
+    "y": 190,
+    "z": 1500,
+    "height": 230,
+    "width": 390,
+    "tabOrder": 5
+  }
+}

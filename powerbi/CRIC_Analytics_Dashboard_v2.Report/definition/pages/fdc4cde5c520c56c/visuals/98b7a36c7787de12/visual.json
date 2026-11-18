@@ -1,0 +1,56 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "98b7a36c7787de12",
+  "visual": {
+    "visualType": "barChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_batter_career_performance"
+                    }
+                  },
+                  "Property": "batter_name"
+                }
+              },
+              "queryRef": "v_batter_career_performance.batter_name",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_batter_career_performance"
+                    }
+                  },
+                  "Property": "Total Runs"
+                }
+              },
+              "queryRef": "v_batter_career_performance.Total Runs",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 830,
+    "y": 190,
+    "z": 1500,
+    "height": 230,
+    "width": 390,
+    "tabOrder": 5
+  }
+}

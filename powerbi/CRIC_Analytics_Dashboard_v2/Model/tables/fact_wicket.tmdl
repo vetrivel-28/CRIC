@@ -1,0 +1,43 @@
+table fact_wicket
+	column wicket_event_id
+		dataType: int64
+		summarizeBy: count
+		sourceColumn: wicket_event_id
+	column match_id
+		dataType: string
+		summarizeBy: none
+		sourceColumn: match_id
+	column bowler_id
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowler_id
+	column bowler_name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowler_name
+	column kind
+		dataType: string
+		summarizeBy: none
+		sourceColumn: kind
+	column is_bowler_credited
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: is_bowler_credited
+	column over_phase
+		dataType: string
+		summarizeBy: none
+		sourceColumn: over_phase
+	measure 'Total Wicket Events' = COUNTROWS(fact_wicket)
+		formatString: 0
+	measure 'Bowler-Credited Wickets' = CALCULATE(COUNTROWS(fact_wicket), fact_wicket[is_bowler_credited] = TRUE())
+		formatString: 0
+	measure 'Non-Bowler-Credited Dismissals' = [Total Wicket Events] - [Bowler-Credited Wickets]
+		formatString: 0
+	partition fact_wicket = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "cric_analytics"),
+				    Item = Source{[Schema="cricket_fact",Item="fact_wicket"]}[Data]
+				in
+				    Item

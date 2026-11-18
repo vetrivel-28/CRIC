@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "4e554189003e602c",
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_batter_matchups"
+                    }
+                  },
+                  "Property": "Matchup Runs"
+                }
+              },
+              "queryRef": "v_bowler_batter_matchups.Matchup Runs",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 830,
+    "y": 70,
+    "z": 1200,
+    "height": 100,
+    "width": 390,
+    "tabOrder": 2
+  }
+}

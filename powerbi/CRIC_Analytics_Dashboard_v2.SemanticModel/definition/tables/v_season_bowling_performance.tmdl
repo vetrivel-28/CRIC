@@ -1,0 +1,47 @@
+table v_season_bowling_performance
+	column bowler_id
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowler_id
+	column bowler_name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowler_name
+	column season
+		dataType: string
+		summarizeBy: none
+		sourceColumn: season
+	column season_matches
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: season_matches
+	column season_balls
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: season_balls
+	column season_runs
+		dataType: decimal
+		summarizeBy: sum
+		sourceColumn: season_runs
+	column season_wickets
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: season_wickets
+	column season_economy
+		dataType: decimal
+		summarizeBy: average
+		sourceColumn: season_economy
+	measure 'Season Wickets' = SUM(v_season_bowling_performance[season_wickets])
+		formatString: 0
+	measure 'Season Legal Balls' = SUM(v_season_bowling_performance[season_balls])
+		formatString: 0
+	measure 'Season Economy' = DIVIDE(SUM(v_season_bowling_performance[season_runs]) * 6, [Season Legal Balls], BLANK())
+		formatString: 0.00
+	partition v_season_bowling_performance = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "cric_analytics"),
+				    Item = Source{[Schema="cricket_analytics",Item="v_season_bowling_performance"]}[Data]
+				in
+				    Item

@@ -1,0 +1,5 @@
+Segment,Total_Scenarios,Avg_Candidates,Coverage_Pct
+Overall Holdout,1477,4.0,100.0%
+Powerplay (Overs 1-6),523,3.8,100.0%
+Middle Overs (Overs 7-15),559,4.6,100.0%
+Death Overs (Overs 16-20),395,3.5,100.0%

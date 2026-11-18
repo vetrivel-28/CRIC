@@ -1,0 +1,94 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "dc3e1b67ae13634e",
+  "visual": {
+    "visualType": "table",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_batter_career_performance"
+                    }
+                  },
+                  "Property": "batter_name"
+                }
+              },
+              "queryRef": "v_batter_career_performance.batter_name",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_batter_career_performance"
+                    }
+                  },
+                  "Property": "Total Runs"
+                }
+              },
+              "queryRef": "v_batter_career_performance.Total Runs",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_batter_career_performance"
+                    }
+                  },
+                  "Property": "Total Batting Balls"
+                }
+              },
+              "queryRef": "v_batter_career_performance.Total Batting Balls",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_batter_career_performance"
+                    }
+                  },
+                  "Property": "Batting Average"
+                }
+              },
+              "queryRef": "v_batter_career_performance.Batting Average",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_batter_career_performance"
+                    }
+                  },
+                  "Property": "Batting Strike Rate"
+                }
+              },
+              "queryRef": "v_batter_career_performance.Batting Strike Rate",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 430,
+    "y": 440,
+    "z": 1700,
+    "height": 230,
+    "width": 390,
+    "tabOrder": 7
+  }
+}

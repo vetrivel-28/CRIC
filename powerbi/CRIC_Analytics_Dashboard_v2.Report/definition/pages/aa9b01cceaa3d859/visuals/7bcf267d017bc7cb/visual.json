@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "7bcf267d017bc7cb",
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_wicket"
+                    }
+                  },
+                  "Property": "Bowler-Credited Wickets"
+                }
+              },
+              "queryRef": "fact_wicket.Bowler-Credited Wickets",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 430,
+    "y": 70,
+    "z": 1100,
+    "height": 100,
+    "width": 390,
+    "tabOrder": 1
+  }
+}

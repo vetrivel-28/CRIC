@@ -1,0 +1,41 @@
+{
+  "name": "00002_00003_Economy_Comparison",
+  "layouts": [
+    {
+      "id": 0,
+      "position": {
+        "x": 860,
+        "y": 88,
+        "z": 1000,
+        "width": 380,
+        "height": 260
+      }
+    }
+  ],
+  "singleVisual": {
+    "visualType": "clusteredColumnChart",
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "\"Economy Comparison\""
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

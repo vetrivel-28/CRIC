@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "7ea58b310d7e8a94",
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_batter_matchups"
+                    }
+                  },
+                  "Property": "Total Matchups"
+                }
+              },
+              "queryRef": "v_bowler_batter_matchups.Total Matchups",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 30,
+    "y": 70,
+    "z": 1000,
+    "height": 100,
+    "width": 390,
+    "tabOrder": 0
+  }
+}

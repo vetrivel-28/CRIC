@@ -1,0 +1,24 @@
+{
+  "strategy": "Chronological Strict Split (No Future Data Leakage)",
+  "total_matches": 4230,
+  "train": {
+    "count": 2538,
+    "start": "2008-04-18",
+    "end": "2024-02-07"
+  },
+  "validation": {
+    "count": 846,
+    "start": "2024-02-09",
+    "end": "2025-06-01"
+  },
+  "test": {
+    "count": 846,
+    "start": "2025-06-01",
+    "end": "2026-07-13"
+  },
+  "leakage_controls": [
+    "Strict match_date < test_match_date filter on all historical feature joins",
+    "Exclusion of same-day fixtures across concurrent matches",
+    "No post-decision innings or match outcomes incorporated into feature tables"
+  ]
+}

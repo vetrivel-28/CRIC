@@ -1,0 +1,41 @@
+{
+  "name": "00008_00006_Situation_Evidence",
+  "layouts": [
+    {
+      "id": 0,
+      "position": {
+        "x": 860,
+        "y": 370,
+        "z": 1000,
+        "width": 380,
+        "height": 260
+      }
+    }
+  ],
+  "singleVisual": {
+    "visualType": "clusteredColumnChart",
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "\"Situation Evidence\""
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

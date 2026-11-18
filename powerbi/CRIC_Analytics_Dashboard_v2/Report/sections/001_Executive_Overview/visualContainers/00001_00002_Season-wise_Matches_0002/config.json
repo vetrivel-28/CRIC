@@ -1,0 +1,41 @@
+{
+  "name": "00001_00002_Season-wise_Matches",
+  "layouts": [
+    {
+      "id": 0,
+      "position": {
+        "x": 450,
+        "y": 88,
+        "z": 1000,
+        "width": 390,
+        "height": 260
+      }
+    }
+  ],
+  "singleVisual": {
+    "visualType": "clusteredColumnChart",
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "\"Season-wise Matches\""
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "b814623a59cb16be",
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_batter_career_performance"
+                    }
+                  },
+                  "Property": "Total Batters"
+                }
+              },
+              "queryRef": "v_batter_career_performance.Total Batters",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 30,
+    "y": 70,
+    "z": 1000,
+    "height": 100,
+    "width": 390,
+    "tabOrder": 0
+  }
+}

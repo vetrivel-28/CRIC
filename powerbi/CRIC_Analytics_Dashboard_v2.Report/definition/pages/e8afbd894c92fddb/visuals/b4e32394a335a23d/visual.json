@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "b4e32394a335a23d",
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_wicket"
+                    }
+                  },
+                  "Property": "Total Wicket Events"
+                }
+              },
+              "queryRef": "fact_wicket.Total Wicket Events",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 430,
+    "y": 190,
+    "z": 1400,
+    "height": 230,
+    "width": 390,
+    "tabOrder": 4
+  }
+}

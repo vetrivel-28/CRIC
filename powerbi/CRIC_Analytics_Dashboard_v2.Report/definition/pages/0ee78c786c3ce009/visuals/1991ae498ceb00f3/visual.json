@@ -1,0 +1,122 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "1991ae498ceb00f3",
+  "visual": {
+    "visualType": "table",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_batter_matchups"
+                    }
+                  },
+                  "Property": "bowler_name"
+                }
+              },
+              "queryRef": "v_bowler_batter_matchups.bowler_name",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_batter_matchups"
+                    }
+                  },
+                  "Property": "batter_name"
+                }
+              },
+              "queryRef": "v_bowler_batter_matchups.batter_name",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_batter_matchups"
+                    }
+                  },
+                  "Property": "Matchup Legal Balls"
+                }
+              },
+              "queryRef": "v_bowler_batter_matchups.Matchup Legal Balls",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_batter_matchups"
+                    }
+                  },
+                  "Property": "Matchup Runs"
+                }
+              },
+              "queryRef": "v_bowler_batter_matchups.Matchup Runs",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_batter_matchups"
+                    }
+                  },
+                  "Property": "Matchup Wickets"
+                }
+              },
+              "queryRef": "v_bowler_batter_matchups.Matchup Wickets",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_batter_matchups"
+                    }
+                  },
+                  "Property": "Matchup Economy"
+                }
+              },
+              "queryRef": "v_bowler_batter_matchups.Matchup Economy",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_batter_matchups"
+                    }
+                  },
+                  "Property": "sample_size_flag"
+                }
+              },
+              "queryRef": "v_bowler_batter_matchups.sample_size_flag",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 430,
+    "y": 440,
+    "z": 1700,
+    "height": 230,
+    "width": 390,
+    "tabOrder": 7
+  }
+}

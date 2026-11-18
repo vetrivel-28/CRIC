@@ -1,0 +1,56 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "6eec30191bed285c",
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_phase_performance"
+                    }
+                  },
+                  "Property": "match_phase"
+                }
+              },
+              "queryRef": "v_bowler_phase_performance.match_phase",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_phase_performance"
+                    }
+                  },
+                  "Property": "Phase Wickets"
+                }
+              },
+              "queryRef": "v_bowler_phase_performance.Phase Wickets",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 830,
+    "y": 190,
+    "z": 1500,
+    "height": 230,
+    "width": 390,
+    "tabOrder": 5
+  }
+}

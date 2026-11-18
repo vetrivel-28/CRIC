@@ -1,0 +1,56 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "760d794e1856df07",
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_situation_performance"
+                    }
+                  },
+                  "Property": "situation_value"
+                }
+              },
+              "queryRef": "v_bowler_situation_performance.situation_value",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_situation_performance"
+                    }
+                  },
+                  "Property": "Situation Economy"
+                }
+              },
+              "queryRef": "v_bowler_situation_performance.Situation Economy",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 830,
+    "y": 190,
+    "z": 1500,
+    "height": 230,
+    "width": 390,
+    "tabOrder": 5
+  }
+}

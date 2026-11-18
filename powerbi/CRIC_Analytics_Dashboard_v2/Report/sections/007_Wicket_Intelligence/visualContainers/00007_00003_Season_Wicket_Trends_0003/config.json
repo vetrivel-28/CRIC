@@ -1,0 +1,41 @@
+{
+  "name": "00007_00003_Season_Wicket_Trends",
+  "layouts": [
+    {
+      "id": 0,
+      "position": {
+        "x": 860,
+        "y": 88,
+        "z": 1000,
+        "width": 380,
+        "height": 260
+      }
+    }
+  ],
+  "singleVisual": {
+    "visualType": "lineChart",
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "\"Season Wicket Trends\""
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "bc4fa741d4ca286e",
+  "visual": {
+    "visualType": "table",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_wicket_profiles"
+                    }
+                  },
+                  "Property": "bowler_name"
+                }
+              },
+              "queryRef": "v_wicket_profiles.bowler_name",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_wicket_profiles"
+                    }
+                  },
+                  "Property": "Profile Total Wickets"
+                }
+              },
+              "queryRef": "v_wicket_profiles.Profile Total Wickets",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_wicket_profiles"
+                    }
+                  },
+                  "Property": "Profile Credited Wickets"
+                }
+              },
+              "queryRef": "v_wicket_profiles.Profile Credited Wickets",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_wicket_profiles"
+                    }
+                  },
+                  "Property": "bowled"
+                }
+              },
+              "queryRef": "v_wicket_profiles.bowled",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_wicket_profiles"
+                    }
+                  },
+                  "Property": "caught"
+                }
+              },
+              "queryRef": "v_wicket_profiles.caught",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_wicket_profiles"
+                    }
+                  },
+                  "Property": "lbw"
+                }
+              },
+              "queryRef": "v_wicket_profiles.lbw",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_wicket_profiles"
+                    }
+                  },
+                  "Property": "pct_bowled_or_lbw"
+                }
+              },
+              "queryRef": "v_wicket_profiles.pct_bowled_or_lbw",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 430,
+    "y": 440,
+    "z": 1700,
+    "height": 230,
+    "width": 390,
+    "tabOrder": 7
+  }
+}

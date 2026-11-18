@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "c7fca68d2be72ae4",
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_phase_performance"
+                    }
+                  },
+                  "Property": "Phase Legal Balls"
+                }
+              },
+              "queryRef": "v_bowler_phase_performance.Phase Legal Balls",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 30,
+    "y": 70,
+    "z": 1000,
+    "height": 100,
+    "width": 390,
+    "tabOrder": 0
+  }
+}

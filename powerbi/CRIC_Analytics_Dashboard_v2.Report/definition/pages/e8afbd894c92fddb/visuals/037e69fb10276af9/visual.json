@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "037e69fb10276af9",
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_career_performance"
+                    }
+                  },
+                  "Property": "Total Bowlers"
+                }
+              },
+              "queryRef": "v_bowler_career_performance.Total Bowlers",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 830,
+    "y": 70,
+    "z": 1200,
+    "height": 100,
+    "width": 390,
+    "tabOrder": 2
+  }
+}

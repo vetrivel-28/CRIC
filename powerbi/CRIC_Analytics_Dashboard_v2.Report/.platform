@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "CRIC Analytics Dashboard v2"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "03b43c37-6b60-5112-9a73-388e84c29897"
+  }
+}

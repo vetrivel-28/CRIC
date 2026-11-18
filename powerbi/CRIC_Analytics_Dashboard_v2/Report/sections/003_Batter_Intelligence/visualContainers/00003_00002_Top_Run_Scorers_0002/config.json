@@ -1,0 +1,41 @@
+{
+  "name": "00003_00002_Top_Run_Scorers",
+  "layouts": [
+    {
+      "id": 0,
+      "position": {
+        "x": 450,
+        "y": 88,
+        "z": 1000,
+        "width": 390,
+        "height": 260
+      }
+    }
+  ],
+  "singleVisual": {
+    "visualType": "barChart",
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "\"Top Run Scorers\""
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

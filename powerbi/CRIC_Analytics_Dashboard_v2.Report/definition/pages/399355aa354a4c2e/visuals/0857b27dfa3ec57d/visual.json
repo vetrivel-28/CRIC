@@ -1,0 +1,108 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "0857b27dfa3ec57d",
+  "visual": {
+    "visualType": "table",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_situation_performance"
+                    }
+                  },
+                  "Property": "bowler_name"
+                }
+              },
+              "queryRef": "v_bowler_situation_performance.bowler_name",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_situation_performance"
+                    }
+                  },
+                  "Property": "situation_type"
+                }
+              },
+              "queryRef": "v_bowler_situation_performance.situation_type",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_situation_performance"
+                    }
+                  },
+                  "Property": "situation_value"
+                }
+              },
+              "queryRef": "v_bowler_situation_performance.situation_value",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_situation_performance"
+                    }
+                  },
+                  "Property": "Situation Legal Balls"
+                }
+              },
+              "queryRef": "v_bowler_situation_performance.Situation Legal Balls",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_situation_performance"
+                    }
+                  },
+                  "Property": "Situation Wickets"
+                }
+              },
+              "queryRef": "v_bowler_situation_performance.Situation Wickets",
+              "active": true
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_situation_performance"
+                    }
+                  },
+                  "Property": "Situation Economy"
+                }
+              },
+              "queryRef": "v_bowler_situation_performance.Situation Economy",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 830,
+    "y": 190,
+    "z": 1500,
+    "height": 230,
+    "width": 390,
+    "tabOrder": 5
+  }
+}

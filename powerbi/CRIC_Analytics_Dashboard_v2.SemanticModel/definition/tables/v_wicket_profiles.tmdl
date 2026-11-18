@@ -1,0 +1,63 @@
+table v_wicket_profiles
+	column bowler_id
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowler_id
+	column bowler_name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowler_name
+	column total_wickets
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: total_wickets
+	column credited_wickets
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: credited_wickets
+	column bowled
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: bowled
+	column caught
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: caught
+	column lbw
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: lbw
+	column stumped
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: stumped
+	column caught_and_bowled
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: caught_and_bowled
+	column hit_wicket
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: hit_wicket
+	column run_outs
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: run_outs
+	column pct_bowled_or_lbw
+		dataType: decimal
+		summarizeBy: average
+		sourceColumn: pct_bowled_or_lbw
+	measure 'Profile Total Wickets' = SUM(v_wicket_profiles[total_wickets])
+		formatString: 0
+	measure 'Profile Credited Wickets' = SUM(v_wicket_profiles[credited_wickets])
+		formatString: 0
+	measure 'Wicket Profile Table' = [Profile Credited Wickets]
+		formatString: 0
+	partition v_wicket_profiles = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "cric_analytics"),
+				    Item = Source{[Schema="cricket_analytics",Item="v_wicket_profiles"]}[Data]
+				in
+				    Item

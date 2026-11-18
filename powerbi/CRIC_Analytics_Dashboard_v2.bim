@@ -1,0 +1,1212 @@
+{
+  "name": "cric_analytics",
+  "compatibilityLevel": 1567,
+  "model": {
+    "culture": "en-US",
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "sourceQueryCulture": "en-US",
+    "tables": [
+      {
+        "name": "dim_match",
+        "columns": [
+          {
+            "name": "match_id",
+            "dataType": "string",
+            "sourceColumn": "match_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "competition",
+            "dataType": "string",
+            "sourceColumn": "competition",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "season",
+            "dataType": "string",
+            "sourceColumn": "season",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "match_date",
+            "dataType": "dateTime",
+            "sourceColumn": "match_date",
+            "formatString": "yyyy-MM-dd",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "match_type",
+            "dataType": "string",
+            "sourceColumn": "match_type",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "venue",
+            "dataType": "string",
+            "sourceColumn": "venue",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "city",
+            "dataType": "string",
+            "sourceColumn": "city",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "team_1",
+            "dataType": "string",
+            "sourceColumn": "team_1",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "team_2",
+            "dataType": "string",
+            "sourceColumn": "team_2",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "winner",
+            "dataType": "string",
+            "sourceColumn": "winner",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_match",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"127.0.0.1:5432\", \"cric_analytics\"),",
+                "    Item = Source{[Schema=\"cricket_dim\",Item=\"dim_match\"]}[Data]",
+                "in",
+                "    Item"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Total Matches",
+            "expression": "DISTINCTCOUNT(dim_match[match_id])",
+            "formatString": "0"
+          }
+        ]
+      },
+      {
+        "name": "dim_player",
+        "columns": [
+          {
+            "name": "player_id",
+            "dataType": "string",
+            "sourceColumn": "player_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "player_name",
+            "dataType": "string",
+            "sourceColumn": "player_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "country",
+            "dataType": "string",
+            "sourceColumn": "country",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "primary_role",
+            "dataType": "string",
+            "sourceColumn": "primary_role",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "batting_hand",
+            "dataType": "string",
+            "sourceColumn": "batting_hand",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "bowling_hand",
+            "dataType": "string",
+            "sourceColumn": "bowling_hand",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "bowling_category",
+            "dataType": "string",
+            "sourceColumn": "bowling_category",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_player",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"127.0.0.1:5432\", \"cric_analytics\"),",
+                "    Item = Source{[Schema=\"cricket_dim\",Item=\"dim_player\"]}[Data]",
+                "in",
+                "    Item"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Total Players",
+            "expression": "DISTINCTCOUNT(dim_player[player_id])",
+            "formatString": "0"
+          }
+        ]
+      },
+      {
+        "name": "dim_dismissal",
+        "columns": [
+          {
+            "name": "dismissal_kind",
+            "dataType": "string",
+            "sourceColumn": "dismissal_kind",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "is_bowler_credited",
+            "dataType": "boolean",
+            "sourceColumn": "is_bowler_credited",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "description",
+            "dataType": "string",
+            "sourceColumn": "description",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_dismissal",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"127.0.0.1:5432\", \"cric_analytics\"),",
+                "    Item = Source{[Schema=\"cricket_dim\",Item=\"dim_dismissal\"]}[Data]",
+                "in",
+                "    Item"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "fact_wicket",
+        "columns": [
+          {
+            "name": "wicket_event_id",
+            "dataType": "int64",
+            "sourceColumn": "wicket_event_id",
+            "summarizeBy": "count"
+          },
+          {
+            "name": "match_id",
+            "dataType": "string",
+            "sourceColumn": "match_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "bowler_id",
+            "dataType": "string",
+            "sourceColumn": "bowler_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "bowler_name",
+            "dataType": "string",
+            "sourceColumn": "bowler_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "kind",
+            "dataType": "string",
+            "sourceColumn": "kind",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "is_bowler_credited",
+            "dataType": "boolean",
+            "sourceColumn": "is_bowler_credited",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "over_phase",
+            "dataType": "string",
+            "sourceColumn": "over_phase",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "fact_wicket",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"127.0.0.1:5432\", \"cric_analytics\"),",
+                "    Item = Source{[Schema=\"cricket_fact\",Item=\"fact_wicket\"]}[Data]",
+                "in",
+                "    Item"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Total Wicket Events",
+            "expression": "COUNTROWS(fact_wicket)",
+            "formatString": "0"
+          },
+          {
+            "name": "Bowler-Credited Wickets",
+            "expression": "CALCULATE(COUNTROWS(fact_wicket), fact_wicket[is_bowler_credited] = TRUE())",
+            "formatString": "0"
+          },
+          {
+            "name": "Non-Bowler-Credited Dismissals",
+            "expression": "[Total Wicket Events] - [Bowler-Credited Wickets]",
+            "formatString": "0"
+          }
+        ]
+      },
+      {
+        "name": "v_batter_career_performance",
+        "columns": [
+          {
+            "name": "batter_id",
+            "dataType": "string",
+            "sourceColumn": "batter_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "batter_name",
+            "dataType": "string",
+            "sourceColumn": "batter_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "country",
+            "dataType": "string",
+            "sourceColumn": "country",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "batting_hand",
+            "dataType": "string",
+            "sourceColumn": "batting_hand",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "matches_batted",
+            "dataType": "int64",
+            "sourceColumn": "matches_batted",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "innings_batted",
+            "dataType": "int64",
+            "sourceColumn": "innings_batted",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "balls_faced",
+            "dataType": "int64",
+            "sourceColumn": "balls_faced",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "runs_scored",
+            "dataType": "int64",
+            "sourceColumn": "runs_scored",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "dismissals",
+            "dataType": "int64",
+            "sourceColumn": "dismissals",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "fours",
+            "dataType": "int64",
+            "sourceColumn": "fours",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "sixes",
+            "dataType": "int64",
+            "sourceColumn": "sixes",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "strike_rate",
+            "dataType": "decimal",
+            "sourceColumn": "strike_rate",
+            "summarizeBy": "average"
+          },
+          {
+            "name": "batting_average",
+            "dataType": "decimal",
+            "sourceColumn": "batting_average",
+            "summarizeBy": "average"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "v_batter_career_performance",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"127.0.0.1:5432\", \"cric_analytics\"),",
+                "    Item = Source{[Schema=\"cricket_analytics\",Item=\"v_batter_career_performance\"]}[Data]",
+                "in",
+                "    Item"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Total Batters",
+            "expression": "DISTINCTCOUNT(v_batter_career_performance[batter_id])",
+            "formatString": "0"
+          },
+          {
+            "name": "Total Runs",
+            "expression": "SUM(v_batter_career_performance[runs_scored])",
+            "formatString": "0"
+          },
+          {
+            "name": "Total Batting Balls",
+            "expression": "SUM(v_batter_career_performance[balls_faced])",
+            "formatString": "0"
+          },
+          {
+            "name": "Batting Average",
+            "expression": "DIVIDE([Total Runs], SUM(v_batter_career_performance[dismissals]), BLANK())",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Batting Strike Rate",
+            "expression": "DIVIDE([Total Runs] * 100, [Total Batting Balls], BLANK())",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Batter Career",
+            "expression": "[Total Runs]",
+            "formatString": "0"
+          }
+        ]
+      },
+      {
+        "name": "v_bowler_batter_matchups",
+        "columns": [
+          {
+            "name": "bowler_id",
+            "dataType": "string",
+            "sourceColumn": "bowler_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "batter_id",
+            "dataType": "string",
+            "sourceColumn": "batter_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "bowler_name",
+            "dataType": "string",
+            "sourceColumn": "bowler_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "batter_name",
+            "dataType": "string",
+            "sourceColumn": "batter_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "balls",
+            "dataType": "int64",
+            "sourceColumn": "balls",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "runs_conceded_by_bowler",
+            "dataType": "decimal",
+            "sourceColumn": "runs_conceded_by_bowler",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "wickets",
+            "dataType": "int64",
+            "sourceColumn": "wickets",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "economy",
+            "dataType": "decimal",
+            "sourceColumn": "economy",
+            "summarizeBy": "average"
+          },
+          {
+            "name": "average",
+            "dataType": "decimal",
+            "sourceColumn": "average",
+            "summarizeBy": "average"
+          },
+          {
+            "name": "strike_rate",
+            "dataType": "decimal",
+            "sourceColumn": "strike_rate",
+            "summarizeBy": "average"
+          },
+          {
+            "name": "sample_size_flag",
+            "dataType": "string",
+            "sourceColumn": "sample_size_flag",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "v_bowler_batter_matchups",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"127.0.0.1:5432\", \"cric_analytics\"),",
+                "    Item = Source{[Schema=\"cricket_analytics\",Item=\"v_bowler_batter_matchups\"]}[Data]",
+                "in",
+                "    Item"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Total Matchups",
+            "expression": "COUNTROWS(v_bowler_batter_matchups)",
+            "formatString": "0"
+          },
+          {
+            "name": "Matchup Legal Balls",
+            "expression": "SUM(v_bowler_batter_matchups[balls])",
+            "formatString": "0"
+          },
+          {
+            "name": "Matchup Runs",
+            "expression": "SUM(v_bowler_batter_matchups[runs_conceded_by_bowler])",
+            "formatString": "0"
+          },
+          {
+            "name": "Matchup Wickets",
+            "expression": "SUM(v_bowler_batter_matchups[wickets])",
+            "formatString": "0"
+          },
+          {
+            "name": "Matchup Economy",
+            "expression": "DIVIDE([Matchup Runs] * 6, [Matchup Legal Balls], BLANK())",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Bowler-Batter Matrix",
+            "expression": "[Matchup Economy]",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Matchup Table",
+            "expression": "[Matchup Economy]",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Head-to-Head Evidence",
+            "expression": "[Matchup Economy]",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Matchup Wickets (Batter Context)",
+            "expression": "CALCULATE([Matchup Wickets], USERELATIONSHIP(v_bowler_batter_matchups[batter_id], dim_player[player_id]))",
+            "formatString": "0"
+          },
+          {
+            "name": "Matchup Runs (Batter Context)",
+            "expression": "CALCULATE([Matchup Runs], USERELATIONSHIP(v_bowler_batter_matchups[batter_id], dim_player[player_id]))",
+            "formatString": "0"
+          },
+          {
+            "name": "Matchup Balls (Batter Context)",
+            "expression": "CALCULATE([Matchup Legal Balls], USERELATIONSHIP(v_bowler_batter_matchups[batter_id], dim_player[player_id]))",
+            "formatString": "0"
+          },
+          {
+            "name": "Matchup Economy (Batter Context)",
+            "expression": "CALCULATE([Matchup Economy], USERELATIONSHIP(v_bowler_batter_matchups[batter_id], dim_player[player_id]))",
+            "formatString": "0.00"
+          }
+        ]
+      },
+      {
+        "name": "v_bowler_career_performance",
+        "columns": [
+          {
+            "name": "bowler_id",
+            "dataType": "string",
+            "sourceColumn": "bowler_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "bowler_name",
+            "dataType": "string",
+            "sourceColumn": "bowler_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "country",
+            "dataType": "string",
+            "sourceColumn": "country",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "bowling_category",
+            "dataType": "string",
+            "sourceColumn": "bowling_category",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "matches_bowled",
+            "dataType": "int64",
+            "sourceColumn": "matches_bowled",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "legal_balls",
+            "dataType": "int64",
+            "sourceColumn": "legal_balls",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "runs_conceded",
+            "dataType": "decimal",
+            "sourceColumn": "runs_conceded",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "wickets",
+            "dataType": "int64",
+            "sourceColumn": "wickets",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "economy",
+            "dataType": "decimal",
+            "sourceColumn": "economy",
+            "summarizeBy": "average"
+          },
+          {
+            "name": "strike_rate",
+            "dataType": "decimal",
+            "sourceColumn": "strike_rate",
+            "summarizeBy": "average"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "v_bowler_career_performance",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"127.0.0.1:5432\", \"cric_analytics\"),",
+                "    Item = Source{[Schema=\"cricket_analytics\",Item=\"v_bowler_career_performance\"]}[Data]",
+                "in",
+                "    Item"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Total Bowlers",
+            "expression": "DISTINCTCOUNT(v_bowler_career_performance[bowler_id])",
+            "formatString": "0"
+          },
+          {
+            "name": "Total Legal Balls",
+            "expression": "SUM(v_bowler_career_performance[legal_balls])",
+            "formatString": "0"
+          },
+          {
+            "name": "Runs Conceded",
+            "expression": "SUM(v_bowler_career_performance[runs_conceded])",
+            "formatString": "0"
+          },
+          {
+            "name": "Credited Wickets",
+            "expression": "SUM(v_bowler_career_performance[wickets])",
+            "formatString": "0"
+          },
+          {
+            "name": "Economy Rate",
+            "expression": "DIVIDE([Runs Conceded] * 6, [Total Legal Balls], BLANK())",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Bowling Strike Rate",
+            "expression": "DIVIDE([Total Legal Balls], [Credited Wickets], BLANK())",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Wicket Rate",
+            "expression": "DIVIDE([Credited Wickets], [Total Legal Balls], BLANK())",
+            "formatString": "0.000%"
+          },
+          {
+            "name": "Recommended Shortlist",
+            "expression": "[Credited Wickets]",
+            "formatString": "0"
+          },
+          {
+            "name": "Bowler Career",
+            "expression": "[Credited Wickets]",
+            "formatString": "0"
+          }
+        ]
+      },
+      {
+        "name": "v_bowler_phase_performance",
+        "columns": [
+          {
+            "name": "bowler_id",
+            "dataType": "string",
+            "sourceColumn": "bowler_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "bowler_name",
+            "dataType": "string",
+            "sourceColumn": "bowler_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "match_phase",
+            "dataType": "string",
+            "sourceColumn": "match_phase",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "phase_balls",
+            "dataType": "int64",
+            "sourceColumn": "phase_balls",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "phase_runs_conceded",
+            "dataType": "decimal",
+            "sourceColumn": "phase_runs_conceded",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "phase_wickets",
+            "dataType": "int64",
+            "sourceColumn": "phase_wickets",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "phase_economy",
+            "dataType": "decimal",
+            "sourceColumn": "phase_economy",
+            "summarizeBy": "average"
+          },
+          {
+            "name": "phase_strike_rate",
+            "dataType": "decimal",
+            "sourceColumn": "phase_strike_rate",
+            "summarizeBy": "average"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "v_bowler_phase_performance",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"127.0.0.1:5432\", \"cric_analytics\"),",
+                "    Item = Source{[Schema=\"cricket_analytics\",Item=\"v_bowler_phase_performance\"]}[Data]",
+                "in",
+                "    Item"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Phase Legal Balls",
+            "expression": "SUM(v_bowler_phase_performance[phase_balls])",
+            "formatString": "0"
+          },
+          {
+            "name": "Phase Runs Conceded",
+            "expression": "SUM(v_bowler_phase_performance[phase_runs_conceded])",
+            "formatString": "0"
+          },
+          {
+            "name": "Phase Wickets",
+            "expression": "SUM(v_bowler_phase_performance[phase_wickets])",
+            "formatString": "0"
+          },
+          {
+            "name": "Phase Economy",
+            "expression": "DIVIDE([Phase Runs Conceded] * 6, [Phase Legal Balls], BLANK())",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Phase Table",
+            "expression": "[Phase Economy]",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Phase Performance",
+            "expression": "[Phase Economy]",
+            "formatString": "0.00"
+          }
+        ]
+      },
+      {
+        "name": "v_bowler_situation_performance",
+        "columns": [
+          {
+            "name": "bowler_id",
+            "dataType": "string",
+            "sourceColumn": "bowler_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "bowler_name",
+            "dataType": "string",
+            "sourceColumn": "bowler_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "situation_type",
+            "dataType": "string",
+            "sourceColumn": "situation_type",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "situation_value",
+            "dataType": "string",
+            "sourceColumn": "situation_value",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "cricket_over",
+            "dataType": "decimal",
+            "sourceColumn": "cricket_over",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "matches",
+            "dataType": "int64",
+            "sourceColumn": "matches",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "balls",
+            "dataType": "int64",
+            "sourceColumn": "balls",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "runs_conceded",
+            "dataType": "decimal",
+            "sourceColumn": "runs_conceded",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "wickets",
+            "dataType": "int64",
+            "sourceColumn": "wickets",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "economy",
+            "dataType": "decimal",
+            "sourceColumn": "economy",
+            "summarizeBy": "average"
+          },
+          {
+            "name": "sample_size_flag",
+            "dataType": "string",
+            "sourceColumn": "sample_size_flag",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "v_bowler_situation_performance",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"127.0.0.1:5432\", \"cric_analytics\"),",
+                "    Item = Source{[Schema=\"cricket_analytics\",Item=\"v_bowler_situation_performance\"]}[Data]",
+                "in",
+                "    Item"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Situation Records",
+            "expression": "COUNTROWS(v_bowler_situation_performance)",
+            "formatString": "0"
+          },
+          {
+            "name": "Situation Legal Balls",
+            "expression": "SUM(v_bowler_situation_performance[balls])",
+            "formatString": "0"
+          },
+          {
+            "name": "Situation Runs Conceded",
+            "expression": "SUM(v_bowler_situation_performance[runs_conceded])",
+            "formatString": "0"
+          },
+          {
+            "name": "Situation Wickets",
+            "expression": "SUM(v_bowler_situation_performance[wickets])",
+            "formatString": "0"
+          },
+          {
+            "name": "Situation Economy",
+            "expression": "DIVIDE([Situation Runs Conceded] * 6, [Situation Legal Balls], BLANK())",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Situation Matrix",
+            "expression": "[Situation Economy]",
+            "formatString": "0.00"
+          },
+          {
+            "name": "Situation Evidence",
+            "expression": "[Situation Economy]",
+            "formatString": "0.00"
+          }
+        ]
+      },
+      {
+        "name": "v_season_bowling_performance",
+        "columns": [
+          {
+            "name": "bowler_id",
+            "dataType": "string",
+            "sourceColumn": "bowler_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "bowler_name",
+            "dataType": "string",
+            "sourceColumn": "bowler_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "season",
+            "dataType": "string",
+            "sourceColumn": "season",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "season_matches",
+            "dataType": "int64",
+            "sourceColumn": "season_matches",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "season_balls",
+            "dataType": "int64",
+            "sourceColumn": "season_balls",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "season_runs",
+            "dataType": "decimal",
+            "sourceColumn": "season_runs",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "season_wickets",
+            "dataType": "int64",
+            "sourceColumn": "season_wickets",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "season_economy",
+            "dataType": "decimal",
+            "sourceColumn": "season_economy",
+            "summarizeBy": "average"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "v_season_bowling_performance",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"127.0.0.1:5432\", \"cric_analytics\"),",
+                "    Item = Source{[Schema=\"cricket_analytics\",Item=\"v_season_bowling_performance\"]}[Data]",
+                "in",
+                "    Item"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Season Wickets",
+            "expression": "SUM(v_season_bowling_performance[season_wickets])",
+            "formatString": "0"
+          },
+          {
+            "name": "Season Legal Balls",
+            "expression": "SUM(v_season_bowling_performance[season_balls])",
+            "formatString": "0"
+          },
+          {
+            "name": "Season Economy",
+            "expression": "DIVIDE(SUM(v_season_bowling_performance[season_runs]) * 6, [Season Legal Balls], BLANK())",
+            "formatString": "0.00"
+          }
+        ]
+      },
+      {
+        "name": "v_wicket_profiles",
+        "columns": [
+          {
+            "name": "bowler_id",
+            "dataType": "string",
+            "sourceColumn": "bowler_id",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "bowler_name",
+            "dataType": "string",
+            "sourceColumn": "bowler_name",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "total_wickets",
+            "dataType": "int64",
+            "sourceColumn": "total_wickets",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "credited_wickets",
+            "dataType": "int64",
+            "sourceColumn": "credited_wickets",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "bowled",
+            "dataType": "int64",
+            "sourceColumn": "bowled",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "caught",
+            "dataType": "int64",
+            "sourceColumn": "caught",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "lbw",
+            "dataType": "int64",
+            "sourceColumn": "lbw",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "stumped",
+            "dataType": "int64",
+            "sourceColumn": "stumped",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "caught_and_bowled",
+            "dataType": "int64",
+            "sourceColumn": "caught_and_bowled",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "hit_wicket",
+            "dataType": "int64",
+            "sourceColumn": "hit_wicket",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "run_outs",
+            "dataType": "int64",
+            "sourceColumn": "run_outs",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "pct_bowled_or_lbw",
+            "dataType": "decimal",
+            "sourceColumn": "pct_bowled_or_lbw",
+            "summarizeBy": "average"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "v_wicket_profiles",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"127.0.0.1:5432\", \"cric_analytics\"),",
+                "    Item = Source{[Schema=\"cricket_analytics\",Item=\"v_wicket_profiles\"]}[Data]",
+                "in",
+                "    Item"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "Profile Total Wickets",
+            "expression": "SUM(v_wicket_profiles[total_wickets])",
+            "formatString": "0"
+          },
+          {
+            "name": "Profile Credited Wickets",
+            "expression": "SUM(v_wicket_profiles[credited_wickets])",
+            "formatString": "0"
+          },
+          {
+            "name": "Wicket Profile Table",
+            "expression": "[Profile Credited Wickets]",
+            "formatString": "0"
+          }
+        ]
+      },
+      {
+        "name": "dim_season",
+        "columns": [
+          {
+            "name": "season",
+            "dataType": "string",
+            "sourceColumn": "season",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "dim_season",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = PostgreSQL.Database(\"127.0.0.1:5432\", \"cric_analytics\"),",
+                "    Match = Source{[Schema=\"cricket_dim\",Item=\"dim_match\"]}[Data],",
+                "    Seasons = Table.Distinct(Table.SelectColumns(Match, {\"season\"})),",
+                "    Filtered = Table.SelectRows(Seasons, each [season] <> null)",
+                "in",
+                "    Filtered"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "1",
+        "fromTable": "fact_wicket",
+        "fromColumn": "match_id",
+        "toTable": "dim_match",
+        "toColumn": "match_id"
+      },
+      {
+        "name": "2",
+        "fromTable": "v_bowler_career_performance",
+        "fromColumn": "bowler_id",
+        "toTable": "dim_player",
+        "toColumn": "player_id"
+      },
+      {
+        "name": "3",
+        "fromTable": "v_batter_career_performance",
+        "fromColumn": "batter_id",
+        "toTable": "dim_player",
+        "toColumn": "player_id"
+      },
+      {
+        "name": "4",
+        "fromTable": "v_bowler_phase_performance",
+        "fromColumn": "bowler_id",
+        "toTable": "dim_player",
+        "toColumn": "player_id"
+      },
+      {
+        "name": "5",
+        "fromTable": "v_bowler_batter_matchups",
+        "fromColumn": "bowler_id",
+        "toTable": "dim_player",
+        "toColumn": "player_id"
+      },
+      {
+        "name": "6",
+        "fromTable": "v_season_bowling_performance",
+        "fromColumn": "season",
+        "toTable": "dim_season",
+        "toColumn": "season"
+      },
+      {
+        "name": "7",
+        "fromTable": "v_bowler_batter_matchups",
+        "fromColumn": "batter_id",
+        "toTable": "dim_player",
+        "toColumn": "player_id",
+        "isActive": false
+      },
+      {
+        "name": "8",
+        "fromTable": "fact_wicket",
+        "fromColumn": "kind",
+        "toTable": "dim_dismissal",
+        "toColumn": "dismissal_kind"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"dim_match\",\"dim_player\",\"dim_dismissal\",\"fact_wicket\",\"v_batter_career_performance\",\"v_bowler_batter_matchups\",\"v_bowler_career_performance\",\"v_bowler_phase_performance\",\"v_bowler_situation_performance\",\"v_season_bowling_performance\",\"v_wicket_profiles\"]"
+      }
+    ]
+  }
+}

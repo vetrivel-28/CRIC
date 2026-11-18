@@ -1,0 +1,6 @@
+Component,Source_Table,Temporal_Cutoff,Leakage_Status
+Career Performance,cricket_fact.fact_delivery,match_date < '2025-06-01',VERIFIED_ZERO_LEAKAGE
+Phase Performance,cricket_fact.fact_delivery,match_date < '2025-06-01',VERIFIED_ZERO_LEAKAGE
+Matchup Dimensions,cricket_fact.fact_matchup,match_date < '2025-06-01',VERIFIED_ZERO_LEAKAGE
+Situation Tiers,cricket_fact.fact_bowler_situation,match_date < '2025-06-01',VERIFIED_ZERO_LEAKAGE
+Wicket Credits,cricket_fact.fact_wicket,match_date < '2025-06-01',VERIFIED_ZERO_LEAKAGE

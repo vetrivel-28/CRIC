@@ -1,0 +1,41 @@
+{
+  "name": "00004_00001_Matchup_KPIs",
+  "layouts": [
+    {
+      "id": 0,
+      "position": {
+        "x": 40,
+        "y": 88,
+        "z": 1000,
+        "width": 390,
+        "height": 260
+      }
+    }
+  ],
+  "singleVisual": {
+    "visualType": "card",
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "\"Matchup KPIs\""
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

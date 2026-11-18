@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "2d147876fd133b06",
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_batter_matchups"
+                    }
+                  },
+                  "Property": "Matchup Legal Balls"
+                }
+              },
+              "queryRef": "v_bowler_batter_matchups.Matchup Legal Balls",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 30,
+    "y": 440,
+    "z": 1600,
+    "height": 230,
+    "width": 390,
+    "tabOrder": 6
+  }
+}

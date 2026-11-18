@@ -1,0 +1,77 @@
+table v_bowler_batter_matchups
+	column bowler_id
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowler_id
+	column batter_id
+		dataType: string
+		summarizeBy: none
+		sourceColumn: batter_id
+	column bowler_name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowler_name
+	column batter_name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: batter_name
+	column balls
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: balls
+	column runs_conceded_by_bowler
+		dataType: decimal
+		summarizeBy: sum
+		sourceColumn: runs_conceded_by_bowler
+	column wickets
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: wickets
+	column economy
+		dataType: decimal
+		summarizeBy: average
+		sourceColumn: economy
+	column average
+		dataType: decimal
+		summarizeBy: average
+		sourceColumn: average
+	column strike_rate
+		dataType: decimal
+		summarizeBy: average
+		sourceColumn: strike_rate
+	column sample_size_flag
+		dataType: string
+		summarizeBy: none
+		sourceColumn: sample_size_flag
+	measure 'Total Matchups' = COUNTROWS(v_bowler_batter_matchups)
+		formatString: 0
+	measure 'Matchup Legal Balls' = SUM(v_bowler_batter_matchups[balls])
+		formatString: 0
+	measure 'Matchup Runs' = SUM(v_bowler_batter_matchups[runs_conceded_by_bowler])
+		formatString: 0
+	measure 'Matchup Wickets' = SUM(v_bowler_batter_matchups[wickets])
+		formatString: 0
+	measure 'Matchup Economy' = DIVIDE([Matchup Runs] * 6, [Matchup Legal Balls], BLANK())
+		formatString: 0.00
+	measure 'Bowler-Batter Matrix' = [Matchup Economy]
+		formatString: 0.00
+	measure 'Matchup Table' = [Matchup Economy]
+		formatString: 0.00
+	measure 'Head-to-Head Evidence' = [Matchup Economy]
+		formatString: 0.00
+	measure 'Matchup Wickets (Batter Context)' = CALCULATE([Matchup Wickets], USERELATIONSHIP(v_bowler_batter_matchups[batter_id], dim_player[player_id]))
+		formatString: 0
+	measure 'Matchup Runs (Batter Context)' = CALCULATE([Matchup Runs], USERELATIONSHIP(v_bowler_batter_matchups[batter_id], dim_player[player_id]))
+		formatString: 0
+	measure 'Matchup Balls (Batter Context)' = CALCULATE([Matchup Legal Balls], USERELATIONSHIP(v_bowler_batter_matchups[batter_id], dim_player[player_id]))
+		formatString: 0
+	measure 'Matchup Economy (Batter Context)' = CALCULATE([Matchup Economy], USERELATIONSHIP(v_bowler_batter_matchups[batter_id], dim_player[player_id]))
+		formatString: 0.00
+	partition v_bowler_batter_matchups = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "cric_analytics"),
+				    Item = Source{[Schema="cricket_analytics",Item="v_bowler_batter_matchups"]}[Data]
+				in
+				    Item

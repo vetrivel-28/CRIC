@@ -1,0 +1,41 @@
+{
+  "name": "00003_00005_Runs_vs_Strike_Rate",
+  "layouts": [
+    {
+      "id": 0,
+      "position": {
+        "x": 450,
+        "y": 370,
+        "z": 1000,
+        "width": 390,
+        "height": 260
+      }
+    }
+  ],
+  "singleVisual": {
+    "visualType": "scatterChart",
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "\"Runs vs Strike Rate\""
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

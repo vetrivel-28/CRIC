@@ -2,7 +2,7 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/)
 [![Database](https://img.shields.io/badge/PostgreSQL-16%2B%20%2F%2018.4-336791.svg)](https://www.postgresql.org/)
-[![Testing](https://img.shields.io/badge/pytest-124%20passed-brightgreen.svg)](https://pytest.org/)
+[![Testing](https://img.shields.io/badge/pytest-144%20passed-brightgreen.svg)](https://pytest.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 CRIC (Cricket Analytics and Intelligent Match Strategy) is an end-to-end cricket data engineering, analytics, and tactical decision-support platform. Formerly prototyped on a distributed Hadoop ecosystem, CRIC has been completely re-architected into a high-performance **PostgreSQL 18.4 + Python 3.13 + SQL** analytics warehouse designed for downstream business intelligence in **Microsoft Power BI**.
@@ -272,11 +272,39 @@ The CSV mode does not provide the PostgreSQL batter-career view.
 
 ---
 
-## 18. Power BI Integration Status
+## 18. Historical Backtesting Suite
 
-- **Status**: **Prepared for Direct Connection (Dashboard Development Pending)**.
-- **Specifications**: [powerbi/README.md](file:///C:/CRIC/powerbi/README.md) details the star schema relationships and connection settings.
-- **DAX Library**: [powerbi/cric_dax_measures.dax](file:///C:/CRIC/powerbi/cric_dax_measures.dax) provides ready-to-use DAX formulas for Legal Balls, Overs Bowled, Runs Conceded, Dot Ball %, Economy Rate, Bowling Average, and Matchup Shrinkage.
+The platform includes a strict chronological backtesting suite evaluating the multi-component recommendation engine across holdout fixtures with zero future-data leakage:
+```cmd
+python scripts/evaluation/run_historical_backtest.py
+```
+This generates all evaluation artifacts under `reports/final_backtesting/`:
+- `CRIC_Historical_Backtesting_Report.pdf`: Comprehensive PDF evaluation report
+- `CRIC_Baseline_Comparison.csv`: Benchmark comparison against Career, Phase, and Random baselines
+- `CRIC_Match_Level_Results.csv`: Spell-level ranking accuracy and observed economy outcomes
+- `CRIC_Chronological_Splits.json`: 60% Train / 20% Val / 20% Holdout temporal cutoffs
+- `CRIC_Backtesting_Protocol.json` & `CRIC_Limitations.md`: Methodological bounds and non-predictive certifications
+
+---
+
+## 19. Power BI Desktop Dashboard
+
+The genuine 8-page Power BI Desktop report is saved at `powerbi/CRIC_Analytics_Dashboard.pbix` and connects to PostgreSQL 18.4 (`cric_analytics`):
+- **Executive Overview**: Total matches, players, wickets, phase distributions, season trends
+- **Bowler Intelligence**: Career metrics, strike rate vs economy scatter analysis, phase performance
+- **Batter Intelligence**: Leading run-scorers, boundary counts, strike rate vs average
+- **Bowler vs Batter Matchups**: Head-to-head records with 30-ball Bayesian shrinkage indicators
+- **Phase Analysis**: Powerplay, Middle, and Death over comparisons and phase rankings
+- **Situation Intelligence**: Chasing pressure, innings context, and required run rate tiers
+- **Wicket Intelligence**: All 14 dismissal modes and bowler-credited profiles
+- **Match Strategy**: Interactive captaincy decision support and candidate rankings
+
+### Refresh Instructions
+1. Open `powerbi/CRIC_Analytics_Dashboard.pbix` in Microsoft Power BI Desktop.
+2. Under **Transform Data** > **Data Source Settings**, select `PostgreSQL: 127.0.0.1:5432; cric_analytics`.
+3. Provide local credentials (e.g. user `postgres` with your local database password).
+4. Click **Close & Apply** or **Refresh** to reload all 1,375,963 records into the VertiPaq engine.
+5. Apply the custom Ivory + Emerald theme via `powerbi/cric_premium_ivory_emerald_theme.json`.
 
 ---
 

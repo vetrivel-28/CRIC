@@ -1,0 +1,15 @@
+table dim_season
+	column season
+		dataType: string
+		summarizeBy: none
+		sourceColumn: season
+	partition dim_season = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "cric_analytics"),
+				    Match = Source{[Schema="cricket_dim",Item="dim_match"]}[Data],
+				    Seasons = Table.Distinct(Table.SelectColumns(Match, {"season"})),
+				    Filtered = Table.SelectRows(Seasons, each [season] <> null)
+				in
+				    Filtered

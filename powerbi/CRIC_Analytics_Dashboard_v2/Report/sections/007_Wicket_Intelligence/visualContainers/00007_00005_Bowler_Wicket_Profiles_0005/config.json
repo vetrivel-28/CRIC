@@ -1,0 +1,41 @@
+{
+  "name": "00007_00005_Bowler_Wicket_Profiles",
+  "layouts": [
+    {
+      "id": 0,
+      "position": {
+        "x": 450,
+        "y": 370,
+        "z": 1000,
+        "width": 390,
+        "height": 260
+      }
+    }
+  ],
+  "singleVisual": {
+    "visualType": "barChart",
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "\"Bowler Wicket Profiles\""
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

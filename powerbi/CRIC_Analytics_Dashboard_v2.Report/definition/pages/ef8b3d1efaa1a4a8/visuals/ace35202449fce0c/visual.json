@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "ace35202449fce0c",
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_situation_performance"
+                    }
+                  },
+                  "Property": "Situation Economy"
+                }
+              },
+              "queryRef": "v_bowler_situation_performance.Situation Economy",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 430,
+    "y": 190,
+    "z": 1400,
+    "height": 230,
+    "width": 390,
+    "tabOrder": 4
+  }
+}

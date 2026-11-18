@@ -1,0 +1,56 @@
+relationship 1
+	fromColumn: fact_wicket.match_id
+	toColumn: dim_match.match_id
+	fromCardinality: many
+	toCardinality: one
+	crossFilteringBehavior: oneDirection
+
+relationship 2
+	fromColumn: v_bowler_career_performance.bowler_id
+	toColumn: dim_player.player_id
+	fromCardinality: many
+	toCardinality: one
+	crossFilteringBehavior: oneDirection
+
+relationship 3
+	fromColumn: v_batter_career_performance.batter_id
+	toColumn: dim_player.player_id
+	fromCardinality: many
+	toCardinality: one
+	crossFilteringBehavior: oneDirection
+
+relationship 4
+	fromColumn: v_bowler_phase_performance.bowler_id
+	toColumn: dim_player.player_id
+	fromCardinality: many
+	toCardinality: one
+	crossFilteringBehavior: oneDirection
+
+relationship 5
+	fromColumn: v_bowler_batter_matchups.bowler_id
+	toColumn: dim_player.player_id
+	fromCardinality: many
+	toCardinality: one
+	crossFilteringBehavior: oneDirection
+
+relationship 6
+	fromColumn: v_season_bowling_performance.season
+	toColumn: dim_season.season
+	fromCardinality: many
+	toCardinality: one
+	crossFilteringBehavior: oneDirection
+
+relationship 7
+	isActive: false
+	fromColumn: v_bowler_batter_matchups.batter_id
+	toColumn: dim_player.player_id
+	fromCardinality: many
+	toCardinality: one
+	crossFilteringBehavior: oneDirection
+
+relationship 8
+	fromColumn: fact_wicket.kind
+	toColumn: dim_dismissal.dismissal_kind
+	fromCardinality: many
+	toCardinality: one
+	crossFilteringBehavior: oneDirection

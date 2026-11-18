@@ -238,20 +238,24 @@ class DashboardData:
         candidate = str(season_value).strip()
         if normalized in {"all", "all seasons"}:
             return True
+        cand_str = candidate.split("/")[0].strip()
+        cand_year = int(cand_str) if cand_str.isdigit() else None
         if normalized.endswith("+") and normalized[:-1].isdigit():
-            return candidate.isdigit() and int(candidate) >= int(normalized[:-1])
+            thresh = int(normalized[:-1])
+            return cand_year is not None and cand_year >= thresh
         if normalized.endswith(" onwards"):
-            base = normalized[:-8]
+            base = normalized[:-8].strip()
             if not base.isdigit():
                 return False
-            return candidate.isdigit() and int(candidate) >= int(base)
-        return candidate == label
+            return cand_year is not None and cand_year >= int(base)
+        return candidate.casefold() == label.casefold()
 
     def filter_options(self) -> dict[str, Any]:
-        seasons = sorted(
+        raw_seasons = sorted(
             {row.get("season", "").strip() for row in self._season_rows if row.get("season", "").strip()},
             key=lambda value: (value == "Unresolved", value.isdigit() is False, int(value) if value.isdigit() else value.casefold()),
         )
+        seasons = ["2022 onwards"] + [s for s in raw_seasons if s != "2022 onwards"]
         dismissal_types: set[str] = set()
         if self._event_path:
             dismissal_types = {

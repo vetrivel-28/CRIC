@@ -1,0 +1,21 @@
+table dim_dismissal
+	column dismissal_kind
+		dataType: string
+		summarizeBy: none
+		sourceColumn: dismissal_kind
+	column is_bowler_credited
+		dataType: boolean
+		summarizeBy: none
+		sourceColumn: is_bowler_credited
+	column description
+		dataType: string
+		summarizeBy: none
+		sourceColumn: description
+	partition dim_dismissal = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "cric_analytics"),
+				    Item = Source{[Schema="cricket_dim",Item="dim_dismissal"]}[Data]
+				in
+				    Item

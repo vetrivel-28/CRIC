@@ -1,0 +1,18 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+
+annotation PBI_QueryOrder = ["dim_match","dim_player","dim_dismissal","fact_wicket","v_batter_career_performance","v_bowler_batter_matchups","v_bowler_career_performance","v_bowler_phase_performance","v_bowler_situation_performance","v_season_bowling_performance","v_wicket_profiles"]
+
+ref table dim_match
+ref table dim_player
+ref table dim_dismissal
+ref table fact_wicket
+ref table v_batter_career_performance
+ref table v_bowler_batter_matchups
+ref table v_bowler_career_performance
+ref table v_bowler_phase_performance
+ref table v_bowler_situation_performance
+ref table v_season_bowling_performance
+ref table v_wicket_profiles

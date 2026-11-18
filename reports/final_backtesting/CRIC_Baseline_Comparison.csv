@@ -1,0 +1,5 @@
+Model,Top_1_Accuracy,Top_3_Hit_Rate,MRR,NDCG@3,Avg_Observed_Economy,Avg_Observed_Wicket_Rate
+CRIC Composite Recommender,26.74%,79.96%,0.5378,0.7349,8.07,5.65%
+Phase Performance Baseline,27.08%,79.89%,0.5396,0.7309,8.07,5.46%
+Career Performance Baseline,26.74%,79.96%,0.5378,0.7349,8.07,5.65%
+Random Eligible Bowler,25.25%,77.39%,0.5223,0.7208,8.15,5.41%

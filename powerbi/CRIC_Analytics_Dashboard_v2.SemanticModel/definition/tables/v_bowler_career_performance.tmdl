@@ -1,0 +1,67 @@
+table v_bowler_career_performance
+	column bowler_id
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowler_id
+	column bowler_name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowler_name
+	column country
+		dataType: string
+		summarizeBy: none
+		sourceColumn: country
+	column bowling_category
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowling_category
+	column matches_bowled
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: matches_bowled
+	column legal_balls
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: legal_balls
+	column runs_conceded
+		dataType: decimal
+		summarizeBy: sum
+		sourceColumn: runs_conceded
+	column wickets
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: wickets
+	column economy
+		dataType: decimal
+		summarizeBy: average
+		sourceColumn: economy
+	column strike_rate
+		dataType: decimal
+		summarizeBy: average
+		sourceColumn: strike_rate
+	measure 'Total Bowlers' = DISTINCTCOUNT(v_bowler_career_performance[bowler_id])
+		formatString: 0
+	measure 'Total Legal Balls' = SUM(v_bowler_career_performance[legal_balls])
+		formatString: 0
+	measure 'Runs Conceded' = SUM(v_bowler_career_performance[runs_conceded])
+		formatString: 0
+	measure 'Credited Wickets' = SUM(v_bowler_career_performance[wickets])
+		formatString: 0
+	measure 'Economy Rate' = DIVIDE([Runs Conceded] * 6, [Total Legal Balls], BLANK())
+		formatString: 0.00
+	measure 'Bowling Strike Rate' = DIVIDE([Total Legal Balls], [Credited Wickets], BLANK())
+		formatString: 0.00
+	measure 'Wicket Rate' = DIVIDE([Credited Wickets], [Total Legal Balls], BLANK())
+		formatString: 0.000%
+	measure 'Recommended Shortlist' = [Credited Wickets]
+		formatString: 0
+	measure 'Bowler Career' = [Credited Wickets]
+		formatString: 0
+	partition v_bowler_career_performance = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "cric_analytics"),
+				    Item = Source{[Schema="cricket_analytics",Item="v_bowler_career_performance"]}[Data]
+				in
+				    Item

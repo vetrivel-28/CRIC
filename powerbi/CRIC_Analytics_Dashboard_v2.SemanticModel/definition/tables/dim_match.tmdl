@@ -1,0 +1,52 @@
+table dim_match
+	column match_id
+		dataType: string
+		summarizeBy: none
+		sourceColumn: match_id
+	column competition
+		dataType: string
+		summarizeBy: none
+		sourceColumn: competition
+	column season
+		dataType: string
+		summarizeBy: none
+		sourceColumn: season
+	column match_date
+		dataType: dateTime
+		formatString: yyyy-MM-dd
+		summarizeBy: none
+		sourceColumn: match_date
+	column match_type
+		dataType: string
+		summarizeBy: none
+		sourceColumn: match_type
+	column venue
+		dataType: string
+		summarizeBy: none
+		sourceColumn: venue
+	column city
+		dataType: string
+		summarizeBy: none
+		sourceColumn: city
+	column team_1
+		dataType: string
+		summarizeBy: none
+		sourceColumn: team_1
+	column team_2
+		dataType: string
+		summarizeBy: none
+		sourceColumn: team_2
+	column winner
+		dataType: string
+		summarizeBy: none
+		sourceColumn: winner
+	measure 'Total Matches' = DISTINCTCOUNT(dim_match[match_id])
+		formatString: 0
+	partition dim_match = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "cric_analytics"),
+				    Item = Source{[Schema="cricket_dim",Item="dim_match"]}[Data]
+				in
+				    Item

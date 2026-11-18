@@ -1,0 +1,67 @@
+table v_bowler_situation_performance
+	column bowler_id
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowler_id
+	column bowler_name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowler_name
+	column situation_type
+		dataType: string
+		summarizeBy: none
+		sourceColumn: situation_type
+	column situation_value
+		dataType: string
+		summarizeBy: none
+		sourceColumn: situation_value
+	column cricket_over
+		dataType: decimal
+		summarizeBy: sum
+		sourceColumn: cricket_over
+	column matches
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: matches
+	column balls
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: balls
+	column runs_conceded
+		dataType: decimal
+		summarizeBy: sum
+		sourceColumn: runs_conceded
+	column wickets
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: wickets
+	column economy
+		dataType: decimal
+		summarizeBy: average
+		sourceColumn: economy
+	column sample_size_flag
+		dataType: string
+		summarizeBy: none
+		sourceColumn: sample_size_flag
+	measure 'Situation Records' = COUNTROWS(v_bowler_situation_performance)
+		formatString: 0
+	measure 'Situation Legal Balls' = SUM(v_bowler_situation_performance[balls])
+		formatString: 0
+	measure 'Situation Runs Conceded' = SUM(v_bowler_situation_performance[runs_conceded])
+		formatString: 0
+	measure 'Situation Wickets' = SUM(v_bowler_situation_performance[wickets])
+		formatString: 0
+	measure 'Situation Economy' = DIVIDE([Situation Runs Conceded] * 6, [Situation Legal Balls], BLANK())
+		formatString: 0.00
+	measure 'Situation Matrix' = [Situation Economy]
+		formatString: 0.00
+	measure 'Situation Evidence' = [Situation Economy]
+		formatString: 0.00
+	partition v_bowler_situation_performance = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "cric_analytics"),
+				    Item = Source{[Schema="cricket_analytics",Item="v_bowler_situation_performance"]}[Data]
+				in
+				    Item

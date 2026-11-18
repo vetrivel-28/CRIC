@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "a2109db1f317a3a5",
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_wicket_profiles"
+                    }
+                  },
+                  "Property": "Profile Credited Wickets"
+                }
+              },
+              "queryRef": "v_wicket_profiles.Profile Credited Wickets",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 30,
+    "y": 190,
+    "z": 1300,
+    "height": 230,
+    "width": 390,
+    "tabOrder": 3
+  }
+}

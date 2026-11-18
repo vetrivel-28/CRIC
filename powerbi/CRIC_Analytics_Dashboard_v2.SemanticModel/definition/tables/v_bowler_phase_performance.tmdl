@@ -1,0 +1,53 @@
+table v_bowler_phase_performance
+	column bowler_id
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowler_id
+	column bowler_name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowler_name
+	column match_phase
+		dataType: string
+		summarizeBy: none
+		sourceColumn: match_phase
+	column phase_balls
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: phase_balls
+	column phase_runs_conceded
+		dataType: decimal
+		summarizeBy: sum
+		sourceColumn: phase_runs_conceded
+	column phase_wickets
+		dataType: int64
+		summarizeBy: sum
+		sourceColumn: phase_wickets
+	column phase_economy
+		dataType: decimal
+		summarizeBy: average
+		sourceColumn: phase_economy
+	column phase_strike_rate
+		dataType: decimal
+		summarizeBy: average
+		sourceColumn: phase_strike_rate
+	measure 'Phase Legal Balls' = SUM(v_bowler_phase_performance[phase_balls])
+		formatString: 0
+	measure 'Phase Runs Conceded' = SUM(v_bowler_phase_performance[phase_runs_conceded])
+		formatString: 0
+	measure 'Phase Wickets' = SUM(v_bowler_phase_performance[phase_wickets])
+		formatString: 0
+	measure 'Phase Economy' = DIVIDE([Phase Runs Conceded] * 6, [Phase Legal Balls], BLANK())
+		formatString: 0.00
+	measure 'Phase Table' = [Phase Economy]
+		formatString: 0.00
+	measure 'Phase Performance' = [Phase Economy]
+		formatString: 0.00
+	partition v_bowler_phase_performance = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "cric_analytics"),
+				    Item = Source{[Schema="cricket_analytics",Item="v_bowler_phase_performance"]}[Data]
+				in
+				    Item

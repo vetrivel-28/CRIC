@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "6306055708d69253",
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_career_performance"
+                    }
+                  },
+                  "Property": "Economy Rate"
+                }
+              },
+              "queryRef": "v_bowler_career_performance.Economy Rate",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 430,
+    "y": 190,
+    "z": 1400,
+    "height": 230,
+    "width": 390,
+    "tabOrder": 4
+  }
+}

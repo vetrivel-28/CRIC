@@ -132,14 +132,17 @@ class PostgresDashboardData:
         candidate = str(season_value).strip()
         if normalized in {"all", "all seasons"}:
             return True
+        cand_str = candidate.split("/")[0].strip()
+        cand_year = int(cand_str) if cand_str.isdigit() else None
         if normalized.endswith("+") and normalized[:-1].isdigit():
-            return candidate.isdigit() and int(candidate) >= int(normalized[:-1])
+            thresh = int(normalized[:-1])
+            return cand_year is not None and cand_year >= thresh
         if normalized.endswith(" onwards"):
-            base = normalized[:-8]
+            base = normalized[:-8].strip()
             if not base.isdigit():
                 return False
-            return candidate.isdigit() and int(candidate) >= int(base)
-        return candidate == label
+            return cand_year is not None and cand_year >= int(base)
+        return candidate.casefold() == label.casefold()
 
     def filter_options(self) -> dict[str, Any]:
         batters = {
@@ -152,9 +155,11 @@ class PostgresDashboardData:
             situation_value = str(row.get("situation_value") or "").strip()
             if situation_type and situation_value:
                 situations.setdefault(situation_type, set()).add(situation_value)
+        raw_seasons = sorted(self._season_names, key=self._season_key)
+        seasons_list = ["2022 onwards"] + [s for s in raw_seasons if s != "2022 onwards"]
         return {
             "phases": sorted(self.engine.phase_labels.values()),
-            "seasons": sorted(self._season_names, key=self._season_key),
+            "seasons": seasons_list,
             "dismissal_types": sorted(self._dismissal_names, key=str.casefold),
             "situations": [
                 {"type": situation_type, "values": sorted(values)}

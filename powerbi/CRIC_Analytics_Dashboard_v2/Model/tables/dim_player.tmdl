@@ -1,0 +1,39 @@
+table dim_player
+	column player_id
+		dataType: string
+		summarizeBy: none
+		sourceColumn: player_id
+	column player_name
+		dataType: string
+		summarizeBy: none
+		sourceColumn: player_name
+	column country
+		dataType: string
+		summarizeBy: none
+		sourceColumn: country
+	column primary_role
+		dataType: string
+		summarizeBy: none
+		sourceColumn: primary_role
+	column batting_hand
+		dataType: string
+		summarizeBy: none
+		sourceColumn: batting_hand
+	column bowling_hand
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowling_hand
+	column bowling_category
+		dataType: string
+		summarizeBy: none
+		sourceColumn: bowling_category
+	measure 'Total Players' = DISTINCTCOUNT(dim_player[player_id])
+		formatString: 0
+	partition dim_player = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("127.0.0.1:5432", "cric_analytics"),
+				    Item = Source{[Schema="cricket_dim",Item="dim_player"]}[Data]
+				in
+				    Item

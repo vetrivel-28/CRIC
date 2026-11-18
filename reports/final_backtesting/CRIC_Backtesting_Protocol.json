@@ -1,0 +1,40 @@
+{
+  "protocol_name": "CRIC Historical Chronological Evaluation Protocol v1.0",
+  "evaluation_date": "2026-11-17T17:56:07.540553",
+  "target_system": "PostgreSQL cric_analytics Star Schema",
+  "weights": {
+    "components": {
+      "performance": 0.6,
+      "matchup": 0.3,
+      "situation": 0.1
+    },
+    "metrics": {
+      "performance": {
+        "economy": 0.45,
+        "strike_rate": 0.25,
+        "wicket_rate": 0.3
+      },
+      "matchup": {
+        "economy": 0.35,
+        "strike_rate": 0.25,
+        "wicket_rate": 0.4
+      },
+      "situation": {
+        "economy": 0.5,
+        "wicket_rate": 0.5
+      }
+    },
+    "reliability_prior_balls": 30.0
+  },
+  "baselines": [
+    "Career Performance",
+    "Phase Performance",
+    "Random Eligible Bowler"
+  ],
+  "statistical_guarantees": [
+    "Strict pre-split temporal cutoff (no future deliveries in candidate stats)",
+    "Minimum spell sample threshold: >= 6 legal balls observed per evaluated spell",
+    "Minimum scenario candidate threshold: >= 3 bowling alternatives available",
+    "Non-calibrated utility: utility scores (0-100) are decision ranks, not win probabilities"
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "c63bb9e04fa524ee",
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_phase_performance"
+                    }
+                  },
+                  "Property": "Phase Wickets"
+                }
+              },
+              "queryRef": "v_bowler_phase_performance.Phase Wickets",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 830,
+    "y": 70,
+    "z": 1200,
+    "height": 100,
+    "width": 390,
+    "tabOrder": 2
+  }
+}

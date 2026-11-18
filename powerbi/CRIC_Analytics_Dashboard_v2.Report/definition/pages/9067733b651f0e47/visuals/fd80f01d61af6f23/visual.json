@@ -1,0 +1,74 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "fd80f01d61af6f23",
+  "visual": {
+    "visualType": "scatterChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_career_performance"
+                    }
+                  },
+                  "Property": "bowler_name"
+                }
+              },
+              "queryRef": "v_bowler_career_performance.bowler_name",
+              "active": true
+            }
+          ]
+        },
+        "X": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_career_performance"
+                    }
+                  },
+                  "Property": "Economy Rate"
+                }
+              },
+              "queryRef": "v_bowler_career_performance.Economy Rate",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "v_bowler_career_performance"
+                    }
+                  },
+                  "Property": "Credited Wickets"
+                }
+              },
+              "queryRef": "v_bowler_career_performance.Credited Wickets",
+              "active": true
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "position": {
+    "x": 430,
+    "y": 440,
+    "z": 1700,
+    "height": 230,
+    "width": 390,
+    "tabOrder": 7
+  }
+}
